@@ -35,7 +35,7 @@ import { Book, Shelf } from '../../core/domain';
         @if (memberOf().length) {
           <div class="tags">
             @for (shelf of memberOf(); track shelf.id) {
-              <span class="tag" [style.--shelf]="shelf.color" [title]="shelf.name">{{ shelf.emoji }}</span>
+              <span class="tag" [style.--shelf]="shelf.color" [title]="shelf.name"><mat-icon>{{ shelf.icon }}</mat-icon></span>
             }
           </div>
         }
@@ -63,7 +63,7 @@ import { Book, Shelf } from '../../core/domain';
       @for (shelf of shelves(); track shelf.id) {
         <button mat-menu-item (click)="toggleShelf.emit({ book: item, shelfId: shelf.id }); $event.stopPropagation()">
           <mat-icon [class.filled]="isMember(shelf.id)">{{ isMember(shelf.id) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-          {{ shelf.emoji }} {{ shelf.name }}
+          {{ shelf.name }}
         </button>
       }
       <button mat-menu-item (click)="newShelf.emit(item)"><mat-icon>add</mat-icon>Nova biblioteca…</button>
@@ -177,9 +177,14 @@ import { Book, Shelf } from '../../core/domain';
       inline-size: 24px;
       block-size: 24px;
       border-radius: 8px;
-      font-size: 13px;
+      color: var(--shelf);
       background: color-mix(in srgb, var(--shelf) 22%, transparent);
       box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--shelf) 45%, transparent);
+    }
+    .tag mat-icon {
+      font-size: 16px;
+      inline-size: 16px;
+      block-size: 16px;
     }
     .progress {
       display: flex;
