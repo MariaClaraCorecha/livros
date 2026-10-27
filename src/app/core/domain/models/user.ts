@@ -9,7 +9,7 @@ export interface AuthUser {
 }
 
 export type ColorScheme = 'light' | 'dark' | 'system';
-export type PaletteId = 'sage' | 'ocean' | 'lavender' | 'rose' | 'amber';
+export type PaletteId = 'aurora' | 'sage' | 'ocean' | 'lavender' | 'rose' | 'amber';
 export type ReaderTheme = 'paper' | 'sepia' | 'night';
 export type PageAnimation = 'slide' | 'fade' | 'none';
 
@@ -50,7 +50,10 @@ export interface PaletteOption {
   hex: string;
 }
 
+export const DEFAULT_PALETTE: PaletteId = 'aurora';
+
 export const PALETTES: readonly PaletteOption[] = [
+  { id: 'aurora', label: 'Aurora', hex: '#5b4bf5' },
   { id: 'sage', label: 'Sálvia', hex: '#4c7a5a' },
   { id: 'ocean', label: 'Oceano', hex: '#3a6e9a' },
   { id: 'lavender', label: 'Lavanda', hex: '#7562a8' },
@@ -59,6 +62,8 @@ export const PALETTES: readonly PaletteOption[] = [
 ];
 
 export const AVATAR_RINGS: readonly string[] = [
+  '#5b4bf5',
+  '#ec4899',
   '#4c7a5a',
   '#3a6e9a',
   '#7562a8',
@@ -74,7 +79,7 @@ export function createDefaultProfile(user: AuthUser): UserProfile {
     displayName: user.name,
     bio: '',
     avatarRing: AVATAR_RINGS[0],
-    palette: 'sage',
+    palette: DEFAULT_PALETTE,
     scheme: 'system',
     reader: DEFAULT_READER_PREFERENCES,
   };
