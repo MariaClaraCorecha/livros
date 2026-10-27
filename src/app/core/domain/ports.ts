@@ -23,7 +23,10 @@ export abstract class BookMetadataReader {
 }
 
 export interface ReaderPosition extends LocatorPlacement {
+  /** Primeira página visível. */
   page?: number;
+  /** Última página visível (EPUB em duas colunas mostra mais de uma). */
+  lastPage?: number;
   totalPages?: number;
 }
 
