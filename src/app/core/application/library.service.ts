@@ -50,13 +50,21 @@ export class LibraryService {
     }
   }
 
-  /** Importa arquivos; se `shelfId` for informado, os livros já entram nessa biblioteca. */
-  async import(files: readonly File[], shelfId?: string): Promise<ImportResult> {
+  /**
+   * Importa arquivos; se `shelfId` for informado, os livros já entram nessa biblioteca.
+   * `onProgress` recebe quantos arquivos já foram processados.
+   */
+  async import(
+    files: readonly File[],
+    shelfId?: string,
+    onProgress?: (done: number) => void,
+  ): Promise<ImportResult> {
     const ownerId = this.auth.user()?.id;
     const result: ImportResult = { imported: 0, rejected: [] };
     if (!ownerId) return result;
 
-    for (const file of files) {
+    for (const [index, file] of files.entries()) {
+      onProgress?.(index);
       const format = detectBookFormat(file.name, file.type);
       if (!format) {
         result.rejected.push(file.name);
