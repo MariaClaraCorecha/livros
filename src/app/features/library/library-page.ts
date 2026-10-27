@@ -1,5 +1,13 @@
 import { PercentPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
@@ -42,7 +50,7 @@ type FormatFilter = BookFormat | 'all';
   styleUrl: './library-page.scss',
   host: {
     '(dragover)': 'onDragOver($event)',
-    '(dragleave)': 'dragging.set(false)',
+    '(dragleave)': 'onDragLeave($event)',
     '(drop)': 'onDrop($event)',
   },
 })
@@ -53,6 +61,7 @@ export class LibraryPage {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly router = inject(Router);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Query param `?estante=<id>`: biblioteca selecionada. */
   readonly estante = input<string>();
@@ -98,6 +107,12 @@ export class LibraryPage {
     if (!event.dataTransfer?.types.includes('Files')) return;
     event.preventDefault();
     this.dragging.set(true);
+  }
+
+  /** O dragleave também dispara ao passar entre elementos filhos; só esconde ao sair da página. */
+  protected onDragLeave(event: DragEvent): void {
+    const target = event.relatedTarget as Node | null;
+    if (!target || !this.host.nativeElement.contains(target)) this.dragging.set(false);
   }
 
   protected onDrop(event: DragEvent): void {

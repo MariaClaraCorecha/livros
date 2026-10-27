@@ -216,6 +216,8 @@ export class PdfReaderEngine implements ReaderEngine {
       // Renderização cancelada (documento fechado durante o carregamento).
     } finally {
       view.rendering = false;
+      // A escala mudou (zoom/redimensionamento) durante a renderização: refaz na escala atual.
+      if (scale !== this.scale && this.isNearViewport(view)) void this.renderPage(view);
     }
   }
 

@@ -63,6 +63,7 @@ export class EpubReaderEngine implements ReaderEngine {
   private location?: Location;
   private locationsReady = false;
   private turning = false;
+  private destroyed = false;
   private appearance?: ReaderAppearance;
   private highlights: readonly Highlight[] = [];
   private readonly painted = new Map<string, { cfi: string; color: string }>();
@@ -119,6 +120,7 @@ export class EpubReaderEngine implements ReaderEngine {
     void this.book.ready
       .then(() => this.book?.locations.generate(1200))
       .then(() => {
+        if (this.destroyed) return;
         this.locationsReady = true;
         this.emitPosition();
       })
@@ -222,6 +224,7 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.disposables.dispose();
     this.rendition?.destroy();
     this.book?.destroy();

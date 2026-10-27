@@ -261,9 +261,13 @@ export class ReaderPage {
   protected async copySelection(): Promise<void> {
     const text = this.selection()?.text;
     if (!text) return;
-    await navigator.clipboard.writeText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+      this.snackBar.open('Trecho copiado.');
+    } catch {
+      this.snackBar.open('Não foi possível copiar o trecho.', 'OK');
+    }
     this.clearSelection();
-    this.snackBar.open('Trecho copiado.');
   }
 
   protected openHighlight(highlightId: string): void {

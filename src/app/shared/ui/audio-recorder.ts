@@ -54,6 +54,10 @@ export class AudioRecorder {
       this.error.set('Permita o acesso ao microfone para gravar');
       return;
     }
+    if (this.discard) {
+      stream.getTracks().forEach((track) => track.stop());
+      return;
+    }
 
     const recorder = new MediaRecorder(stream);
     const chunks: Blob[] = [];

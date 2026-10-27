@@ -117,6 +117,8 @@ export class ProfilePage {
     const url = URL.createObjectURL(file);
     try {
       await this.profiles.update({ avatar: await cropSquare(await resizeImage(url, 512)) });
+    } catch {
+      this.snackBar.open('Não foi possível usar esta imagem.', 'OK');
     } finally {
       URL.revokeObjectURL(url);
     }
