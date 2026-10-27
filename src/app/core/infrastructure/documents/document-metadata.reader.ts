@@ -36,14 +36,13 @@ export class DocumentMetadataReader extends BookMetadataReader {
     const { default: ePub } = await import('epubjs');
     const book = ePub(await file.arrayBuffer());
     try {
-      // Aguarda a abertura completa: destruir antes disso quebra promessas internas do epub.js.
       await Promise.all([book.opened, book.loaded.navigation]);
       const metadata = await book.loaded.metadata;
       const coverUrl = await book.coverUrl();
       return {
         title: metadata.title?.trim() ?? '',
         author: metadata.creator?.trim() ?? '',
-        cover: coverUrl ? await resizeImage(coverUrl, COVER_WIDTH) : undefined, 
+        cover: coverUrl ? await resizeImage(coverUrl, COVER_WIDTH) : undefined,
       };
     } finally {
       book.destroy();
