@@ -62,7 +62,9 @@ export class LibraryService {
         result.rejected.push(file.name);
         continue;
       }
-      const metadata = await this.metadata.read(file, format).catch(() => ({ title: '', author: '', cover: undefined }));
+      const metadata = await this.metadata
+        .read(file, format)
+        .catch(() => ({ title: '', author: '', cover: undefined }));
       const book: Book = {
         id: createId(),
         ownerId,
@@ -97,13 +99,17 @@ export class LibraryService {
     const shelfIds = book.shelfIds ?? [];
     return this.save({
       ...book,
-      shelfIds: shelfIds.includes(shelfId) ? shelfIds.filter((id) => id !== shelfId) : [...shelfIds, shelfId],
+      shelfIds: shelfIds.includes(shelfId)
+        ? shelfIds.filter((id) => id !== shelfId)
+        : [...shelfIds, shelfId],
     });
   }
 
   /** Define exatamente quais livros pertencem à biblioteca `shelfId`. */
   async setShelfMembers(shelfId: string, bookIds: ReadonlySet<string>): Promise<void> {
-    const changed = this.items().filter((book) => (book.shelfIds ?? []).includes(shelfId) !== bookIds.has(book.id));
+    const changed = this.items().filter(
+      (book) => (book.shelfIds ?? []).includes(shelfId) !== bookIds.has(book.id),
+    );
     await Promise.all(changed.map((book) => this.toggleShelf(book, shelfId)));
   }
 

@@ -69,7 +69,9 @@ export class LibraryPage {
   protected readonly shelves = this.shelfService.shelves;
   protected readonly shelf = computed(() => this.shelfService.find(this.estante()));
   protected readonly continueReading = computed(() =>
-    this.shelf() ? undefined : this.books().find((book) => book.lastOpenedAt && book.progress < 0.98),
+    this.shelf()
+      ? undefined
+      : this.books().find((book) => book.lastOpenedAt && book.progress < 0.98),
   );
   protected readonly shelfBooks = computed(() => {
     const shelf = this.shelf();
@@ -163,7 +165,8 @@ export class LibraryPage {
     try {
       const { imported, rejected } = await this.library.import(files, this.shelf()?.id);
       const parts = [];
-      if (imported) parts.push(`${imported} ${imported === 1 ? 'livro adicionado' : 'livros adicionados'}`);
+      if (imported)
+        parts.push(`${imported} ${imported === 1 ? 'livro adicionado' : 'livros adicionados'}`);
       if (rejected.length) parts.push(`${rejected.length} ignorado(s): use PDF ou EPUB`);
       this.snackBar.open(parts.join(' · '), 'OK');
     } catch {

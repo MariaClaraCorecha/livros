@@ -22,7 +22,10 @@
 
     <ul class="features">
       @for (feature of features; track feature.icon) {
-        <li><mat-icon>{{ feature.icon }}</mat-icon>{{ feature.text }}</li>
+        <li>
+          <mat-icon>{{ feature.icon }}</mat-icon
+          >{{ feature.text }}
+        </li>
       }
     </ul>
 
@@ -43,11 +46,24 @@
         <ol>
           <li>
             Abra o
-            <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener">Google Cloud Console → Credenciais</a>.
+            <a
+              href="https://console.cloud.google.com/apis/credentials"
+              target="_blank"
+              rel="noopener"
+              >Google Cloud Console → Credenciais</a
+            >.
           </li>
-          <li>Crie um <strong>ID do cliente OAuth</strong> do tipo <strong>Aplicativo da Web</strong>.</li>
-          <li>Em <strong>Origens JavaScript autorizadas</strong>, adicione <code>{{ origin }}</code>.</li>
-          <li>Cole o ID em <code>public/config.json</code> no campo <code>googleClientId</code> e recarregue a página.</li>
+          <li>
+            Crie um <strong>ID do cliente OAuth</strong> do tipo <strong>Aplicativo da Web</strong>.
+          </li>
+          <li>
+            Em <strong>Origens JavaScript autorizadas</strong>, adicione <code>{{ origin }}</code
+            >.
+          </li>
+          <li>
+            Cole o ID em <code>public/config.json</code> no campo <code>googleClientId</code> e
+            recarregue a página.
+          </li>
         </ol>
       </details>
     }

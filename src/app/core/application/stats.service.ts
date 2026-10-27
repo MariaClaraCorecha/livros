@@ -18,8 +18,14 @@ export class StatsService {
 
   async load(): Promise<ReadingStats> {
     const userId = this.auth.user()?.id;
-    const counts = userId ? await this.annotations.countByOwner(userId) : { highlights: 0, bookmarks: 0 };
+    const counts = userId
+      ? await this.annotations.countByOwner(userId)
+      : { highlights: 0, bookmarks: 0 };
     const books = this.library.library();
-    return { books: books.length, finished: books.filter((book) => book.progress >= 0.98).length, ...counts };
+    return {
+      books: books.length,
+      finished: books.filter((book) => book.progress >= 0.98).length,
+      ...counts,
+    };
   }
 }

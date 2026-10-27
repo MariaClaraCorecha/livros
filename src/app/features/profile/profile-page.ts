@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -64,7 +71,9 @@ export class ProfilePage {
     hex,
   }));
   protected readonly lineHeights = LINE_HEIGHTS;
-  protected readonly previewFont = computed(() => readerFont(this.profile()?.reader.font ?? 'literata').family);
+  protected readonly previewFont = computed(
+    () => readerFont(this.profile()?.reader.font ?? 'literata').family,
+  );
   protected readonly readerThemes: { id: ReaderTheme; label: string }[] = [
     { id: 'paper', label: 'Papel' },
     { id: 'sepia', label: 'Sépia' },

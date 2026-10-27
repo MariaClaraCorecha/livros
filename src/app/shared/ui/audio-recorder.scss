@@ -1,0 +1,16 @@
+:host {
+  display: inline-flex;
+}
+.recording {
+  --mat-button-filled-container-color: var(--mat-sys-error);
+  --mat-button-filled-label-text-color: var(--mat-sys-on-error);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.error {
+  color: var(--mat-sys-error);
+}
+@keyframes pulse {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--mat-sys-error) 25%, transparent);
+  }
+}

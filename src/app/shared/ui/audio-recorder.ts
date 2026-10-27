@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,50 +23,16 @@ const MAX_SECONDS = 300;
   selector: 'app-audio-recorder',
   imports: [MatButtonModule, MatIconModule, MatTooltipModule, DurationPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (recording()) {
-      <button mat-flat-button type="button" class="recording" (click)="stop()">
-        <mat-icon class="filled">stop_circle</mat-icon>
-        {{ elapsed() | duration }}
-      </button>
-    } @else {
-      <button
-        mat-icon-button
-        type="button"
-        [matTooltip]="error() ?? 'Gravar áudio'"
-        [disabled]="!supported"
-        (click)="start()"
-        aria-label="Gravar áudio"
-      >
-        <mat-icon [class.error]="error()">mic</mat-icon>
-      </button>
-    }
-  `,
-  styles: `
-    :host {
-      display: inline-flex;
-    }
-    .recording {
-      --mat-button-filled-container-color: var(--mat-sys-error);
-      --mat-button-filled-label-text-color: var(--mat-sys-on-error);
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    .error {
-      color: var(--mat-sys-error);
-    }
-    @keyframes pulse {
-      50% {
-        box-shadow: 0 0 0 6px color-mix(in srgb, var(--mat-sys-error) 25%, transparent);
-      }
-    }
-  `,
+  templateUrl: './audio-recorder.html',
+  styleUrl: './audio-recorder.scss',
 })
 export class AudioRecorder {
   readonly recorded = output<RecordedAudio>();
   protected readonly recording = signal(false);
   protected readonly elapsed = signal(0);
   protected readonly error = signal<string | null>(null);
-  protected readonly supported = typeof MediaRecorder !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+  protected readonly supported =
+    typeof MediaRecorder !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
 
   private recorder?: MediaRecorder;
   private timer?: ReturnType<typeof setInterval>;

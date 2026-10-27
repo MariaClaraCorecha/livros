@@ -16,7 +16,11 @@
   block-size: 140px;
   background:
     radial-gradient(circle at 15% 30%, var(--mat-sys-tertiary-container), transparent 55%),
-    radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--mat-sys-primary) 55%, transparent), transparent 60%),
+    radial-gradient(
+      circle at 80% 0%,
+      color-mix(in srgb, var(--mat-sys-primary) 55%, transparent),
+      transparent 60%
+    ),
     var(--mat-sys-primary-container);
 }
 
@@ -187,7 +191,9 @@ mat-button-toggle mat-icon {
   cursor: pointer;
 
   span {
-    font: 600 24px Georgia, serif;
+    font:
+      600 24px Georgia,
+      serif;
   }
 
   &[aria-checked='true'] {
@@ -203,7 +209,9 @@ mat-button-toggle mat-icon {
   color: var(--fg);
   line-height: 1.65;
   box-shadow: var(--app-shadow);
-  transition: background 200ms ease, color 200ms ease;
+  transition:
+    background 200ms ease,
+    color 200ms ease;
 
   .chapter {
     font: var(--mat-sys-label-large);

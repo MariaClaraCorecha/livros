@@ -38,7 +38,9 @@ export class GoogleAuthProvider extends AuthProvider {
     const clientId = await this.resolveClientId();
     if (!clientId) throw new AuthNotConfiguredError();
     if (!clientId.endsWith(CLIENT_ID_SUFFIX)) {
-      throw new Error(`O Client ID configurado parece inválido: ele deve terminar com "${CLIENT_ID_SUFFIX}".`);
+      throw new Error(
+        `O Client ID configurado parece inválido: ele deve terminar com "${CLIENT_ID_SUFFIX}".`,
+      );
     }
     const identity = await this.loadIdentity();
     identity.initialize({
@@ -63,7 +65,10 @@ export class GoogleAuthProvider extends AuthProvider {
   private resolveClientId(): Promise<string> {
     this.clientId ??= fetch(new URL('config.json', this.document.baseURI), { cache: 'no-store' })
       .then((response) => (response.ok ? response.json() : {}))
-      .then((config: { googleClientId?: string }) => config.googleClientId?.trim() || environment.googleClientId)
+      .then(
+        (config: { googleClientId?: string }) =>
+          config.googleClientId?.trim() || environment.googleClientId,
+      )
       .catch(() => environment.googleClientId);
     return this.clientId;
   }
@@ -85,7 +90,13 @@ export class GoogleAuthProvider extends AuthProvider {
 
   private toUser(credential: string): AuthUser {
     const token = decodeJwtPayload<GoogleIdToken>(credential);
-    return { id: token.sub, name: token.name, email: token.email, picture: token.picture, provider: 'google' };
+    return {
+      id: token.sub,
+      name: token.name,
+      email: token.email,
+      picture: token.picture,
+      provider: 'google',
+    };
   }
 }
 

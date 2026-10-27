@@ -18,7 +18,12 @@ export class AuthService {
   }
 
   signInAsGuest(): void {
-    this.signIn({ id: 'guest', name: 'Leitor Convidado', email: 'convidado@local', provider: 'guest' });
+    this.signIn({
+      id: 'guest',
+      name: 'Leitor Convidado',
+      email: 'convidado@local',
+      provider: 'guest',
+    });
   }
 
   signOut(): void {

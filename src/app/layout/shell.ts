@@ -11,8 +11,16 @@ import { ProfileService } from '../core/application/profile.service';
 import { ColorScheme } from '../core/domain';
 import { UserAvatar } from '../shared/ui/user-avatar';
 
-const NEXT_SCHEME: Record<ColorScheme, ColorScheme> = { system: 'light', light: 'dark', dark: 'system' };
-const SCHEME_ICON: Record<ColorScheme, string> = { system: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' };
+const NEXT_SCHEME: Record<ColorScheme, ColorScheme> = {
+  system: 'light',
+  light: 'dark',
+  dark: 'system',
+};
+const SCHEME_ICON: Record<ColorScheme, string> = {
+  system: 'brightness_auto',
+  light: 'light_mode',
+  dark: 'dark_mode',
+};
 
 /** Layout das áreas logadas: barra superior no desktop e navegação inferior no celular. */
 @Component({

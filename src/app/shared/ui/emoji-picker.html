@@ -1,0 +1,25 @@
+<div class="tabs" role="tablist" (click)="$event.stopPropagation()">
+  @for (group of groups; track group.label; let index = $index) {
+    <button
+      type="button"
+      role="tab"
+      [attr.aria-selected]="active() === index"
+      (click)="active.set(index)"
+    >
+      {{ group.emojis[0] }} <span>{{ group.label }}</span>
+    </button>
+  }
+</div>
+<div class="grid" role="listbox" [attr.aria-label]="groups[active()].label">
+  @for (emoji of groups[active()].emojis; track emoji) {
+    <button
+      type="button"
+      role="option"
+      class="emoji"
+      [attr.aria-label]="emoji"
+      (click)="picked.emit(emoji)"
+    >
+      {{ emoji }}
+    </button>
+  }
+</div>

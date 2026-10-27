@@ -1,0 +1,56 @@
+:host {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  inline-size: 344px;
+  max-inline-size: calc(100vw - 16px);
+  padding: 6px 6px 6px 14px;
+  border-radius: 26px;
+  background: var(--mat-sys-inverse-surface);
+  color: var(--mat-sys-inverse-on-surface);
+  box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.45);
+  animation: pop 140ms ease-out;
+  --mat-icon-button-icon-color: var(--mat-sys-inverse-on-surface);
+}
+.colors {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.colors.expanded {
+  display: grid;
+  grid-template-columns: repeat(6, 24px);
+  gap: 8px 6px;
+  padding-block: 4px;
+}
+.dot {
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in srgb, var(--dot) 60%, black);
+  background: var(--dot);
+  padding: 0;
+  cursor: pointer;
+  transition: transform 100ms ease;
+  animation: pop 160ms ease-out backwards;
+}
+.dot:hover,
+.dot:focus-visible {
+  transform: scale(1.2);
+  outline: none;
+}
+.divider {
+  inline-size: 1px;
+  align-self: stretch;
+  margin: 6px 2px;
+  background: color-mix(in srgb, currentColor 30%, transparent);
+}
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}

@@ -21,7 +21,10 @@ export class ShelfService {
     const books = this.library.library();
     return [...this.items()]
       .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-      .map((shelf) => ({ ...shelf, count: books.filter((book) => book.shelfIds?.includes(shelf.id)).length }));
+      .map((shelf) => ({
+        ...shelf,
+        count: books.filter((book) => book.shelfIds?.includes(shelf.id)).length,
+      }));
   });
 
   constructor() {

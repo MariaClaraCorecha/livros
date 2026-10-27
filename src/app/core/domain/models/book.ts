@@ -38,4 +38,7 @@ export function detectBookFormat(fileName: string, mimeType = ''): BookFormat | 
 }
 
 export const fileTitle = (fileName: string): string =>
-  fileName.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
+  fileName
+    .replace(/\.[^.]+$/, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();

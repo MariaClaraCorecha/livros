@@ -53,7 +53,6 @@ import { AnnotationsPanel } from './annotations-panel';
 import { HighlightDialog, HighlightDialogData } from './highlight-dialog';
 import { SelectionToolbar } from './selection-toolbar';
 
-
 @Component({
   selector: 'app-reader-page',
   imports: [
@@ -117,21 +116,30 @@ export class ReaderPage {
   protected readonly lastColor = signal<HighlightColor>('yellow');
 
   protected readonly wide = toSignal(
-    inject(BreakpointObserver).observe('(min-width: 1100px)').pipe(map((state) => state.matches)),
+    inject(BreakpointObserver)
+      .observe('(min-width: 1100px)')
+      .pipe(map((state) => state.matches)),
     { initialValue: false },
   );
-  protected readonly appearance = computed(() => this.profiles.profile()?.reader ?? DEFAULT_READER_PREFERENCES);
+  protected readonly appearance = computed(
+    () => this.profiles.profile()?.reader ?? DEFAULT_READER_PREFERENCES,
+  );
   protected readonly progress = computed(() => Math.round((this.position()?.position ?? 0) * 100));
   protected readonly currentBookmark = computed(() => {
     this.position();
-    return this.ready() ? this.bookmarks().find((bookmark) => this.engine?.isVisible(bookmark.locator)) : undefined;
+    return this.ready()
+      ? this.bookmarks().find((bookmark) => this.engine?.isVisible(bookmark.locator))
+      : undefined;
   });
   protected readonly currentBookmarkHex = computed(() => {
     const bookmark = this.currentBookmark();
     return bookmark ? colorHex(BOOKMARK_COLORS, bookmark.color) : null;
   });
 
-  private readonly persistProgress = debounce((position: ReaderPosition) => void this.store.saveProgress(position), 1200);
+  private readonly persistProgress = debounce(
+    (position: ReaderPosition) => void this.store.saveProgress(position),
+    1200,
+  );
 
   constructor() {
     afterNextRender(() => void this.start());
@@ -191,7 +199,9 @@ export class ReaderPage {
       this.toc.set(await engine.tableOfContents());
     } catch (error) {
       console.error(error);
-      this.error.set('Não foi possível abrir este arquivo. Ele pode estar corrompido ou protegido.');
+      this.error.set(
+        'Não foi possível abrir este arquivo. Ele pode estar corrompido ou protegido.',
+      );
     } finally {
       this.loading.set(false);
     }
@@ -222,7 +232,8 @@ export class ReaderPage {
 
   protected onKeydown(event: KeyboardEvent): void {
     const target = event.target as HTMLElement;
-    if (this.dialog.openDialogs.length || target.closest('input, textarea, [contenteditable]')) return;
+    if (this.dialog.openDialogs.length || target.closest('input, textarea, [contenteditable]'))
+      return;
     if (event.key === 'ArrowRight' || event.key === 'PageDown') this.next();
     else if (event.key === 'ArrowLeft' || event.key === 'PageUp') this.prev();
     else return;
@@ -283,7 +294,13 @@ export class ReaderPage {
     if (bookmark) void this.store.removeBookmark(bookmark.id);
   }
 
-  protected recolorBookmark({ bookmark, color }: { bookmark: Bookmark; color: BookmarkColor }): void {
+  protected recolorBookmark({
+    bookmark,
+    color,
+  }: {
+    bookmark: Bookmark;
+    color: BookmarkColor;
+  }): void {
     void this.store.saveBookmark({ ...bookmark, color });
   }
 

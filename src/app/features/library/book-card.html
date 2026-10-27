@@ -1,0 +1,67 @@
+@let item = book();
+<a class="cover" [routerLink]="['/ler', item.id]" [attr.aria-label]="'Abrir ' + item.title">
+  @if (item.cover) {
+    <img [src]="item.cover" alt="" loading="lazy" />
+  } @else {
+    <div class="placeholder" [attr.data-format]="item.format">
+      <mat-icon>{{ item.format === 'pdf' ? 'picture_as_pdf' : 'menu_book' }}</mat-icon>
+      <span>{{ item.title }}</span>
+    </div>
+  }
+  <span class="format">{{ item.format }}</span>
+  @if (item.progress >= 0.98) {
+    <span class="done"><mat-icon>check</mat-icon></span>
+  }
+</a>
+
+<div class="info">
+  <div class="text">
+    <h3 [title]="item.title">{{ item.title }}</h3>
+    <p class="muted">{{ item.author }}</p>
+    @if (memberOf().length) {
+      <div class="tags">
+        @for (shelf of memberOf(); track shelf.id) {
+          <span class="tag" [style.--shelf]="shelf.color" [title]="shelf.name"
+            ><mat-icon>{{ shelf.icon }}</mat-icon></span
+          >
+        }
+      </div>
+    }
+  </div>
+  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Opções do livro">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+</div>
+
+<div class="progress">
+  <mat-progress-bar mode="determinate" [value]="item.progress * 100" />
+  <span>{{ item.progress | percent }}</span>
+</div>
+
+<mat-menu #menu xPosition="before">
+  <a mat-menu-item [routerLink]="['/ler', item.id]"><mat-icon>chrome_reader_mode</mat-icon>Abrir</a>
+  <button mat-menu-item [matMenuTriggerFor]="shelfMenu">
+    <mat-icon>collections_bookmark</mat-icon>Bibliotecas
+  </button>
+  <button mat-menu-item disabled>
+    <mat-icon>description</mat-icon>{{ item.size / 1048576 | number: '1.1-1' }} MB
+  </button>
+  <button mat-menu-item (click)="remove.emit(item)"><mat-icon>delete</mat-icon>Remover</button>
+</mat-menu>
+
+<mat-menu #shelfMenu>
+  @for (shelf of shelves(); track shelf.id) {
+    <button
+      mat-menu-item
+      (click)="toggleShelf.emit({ book: item, shelfId: shelf.id }); $event.stopPropagation()"
+    >
+      <mat-icon [class.filled]="isMember(shelf.id)">{{
+        isMember(shelf.id) ? 'check_box' : 'check_box_outline_blank'
+      }}</mat-icon>
+      {{ shelf.name }}
+    </button>
+  }
+  <button mat-menu-item (click)="newShelf.emit(item)">
+    <mat-icon>add</mat-icon>Nova biblioteca…
+  </button>
+</mat-menu>

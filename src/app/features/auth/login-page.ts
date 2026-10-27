@@ -46,7 +46,9 @@ export class LoginPage {
       this.provider
         .renderButton(this.googleButton().nativeElement, (user) => this.enter(user))
         .catch((error: Error) =>
-          error instanceof AuthNotConfiguredError ? this.needsSetup.set(true) : this.error.set(error.message),
+          error instanceof AuthNotConfiguredError
+            ? this.needsSetup.set(true)
+            : this.error.set(error.message),
         )
         .finally(() => this.loading.set(false));
     });

@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>{{ editing ? 'Editar biblioteca' : 'Nova biblioteca' }}</h2>
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="content">
+    <div class="preview" [style.--shelf]="form.controls.color.value">
+      <mat-icon class="icon">{{ form.controls.icon.value }}</mat-icon>
+      <div>
+        <strong>{{ form.controls.name.value || 'Nome da biblioteca' }}</strong>
+        <span>{{ form.controls.description.value || 'Organize seus livros por categoria' }}</span>
+      </div>
+    </div>
+
+    <mat-form-field>
+      <mat-label>Nome</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        maxlength="40"
+        cdkFocusInitial
+        placeholder="Ex.: Ficção científica"
+      />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Descrição (opcional)</mat-label>
+      <input matInput formControlName="description" maxlength="120" />
+    </mat-form-field>
+
+    <span class="label">Ícone</span>
+    <div class="icons" role="radiogroup" aria-label="Ícone">
+      @for (icon of icons; track icon) {
+        <button
+          type="button"
+          role="radio"
+          [attr.aria-label]="icon"
+          [attr.aria-checked]="form.controls.icon.value === icon"
+          (click)="form.controls.icon.setValue(icon)"
+        >
+          <mat-icon [class.filled]="form.controls.icon.value === icon">{{ icon }}</mat-icon>
+        </button>
+      }
+    </div>
+
+    <span class="label">Cor</span>
+    <app-color-swatches
+      label="Cor da biblioteca"
+      [options]="colors"
+      [selected]="form.controls.color.value"
+      (selectedChange)="form.controls.color.setValue($event)"
+    />
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="form.invalid">
+      {{ editing ? 'Salvar' : 'Criar' }}
+    </button>
+  </mat-dialog-actions>
+</form>

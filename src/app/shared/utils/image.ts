@@ -23,6 +23,16 @@ export async function cropSquare(src: string, size = 256): Promise<string> {
   canvas.width = canvas.height = size;
   canvas
     .getContext('2d')!
-    .drawImage(image, (image.naturalWidth - side) / 2, (image.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+    .drawImage(
+      image,
+      (image.naturalWidth - side) / 2,
+      (image.naturalHeight - side) / 2,
+      side,
+      side,
+      0,
+      0,
+      size,
+      size,
+    );
   return canvas.toDataURL('image/jpeg', 0.88);
 }

@@ -23,7 +23,8 @@ const THEMES: Record<ReaderTheme, { background: string; color: string }> = {
 };
 
 /** Elementos de texto que recebem a fonte e o espaçamento escolhidos (mesmo se o livro definir outros). */
-const TEXT_ELEMENTS = 'body, p, li, blockquote, dd, dt, td, th, div, span, a, em, i, b, strong, h1, h2, h3, h4, h5, h6';
+const TEXT_ELEMENTS =
+  'body, p, li, blockquote, dd, dt, td, th, div, span, a, em, i, b, strong, h1, h2, h3, h4, h5, h6';
 
 /**
  * Regras base aplicadas a todo capítulo. Fonte e altura de linha vêm de variáveis CSS
@@ -32,7 +33,11 @@ const TEXT_ELEMENTS = 'body, p, li, blockquote, dd, dt, td, th, div, span, a, em
 const BASE_STYLES = {
   [TEXT_ELEMENTS]: { 'font-family': 'var(--reader-font) !important' },
   'p, li, blockquote, dd': { 'line-height': 'var(--reader-line-height) !important' },
-  'img, svg, video': { 'max-width': '100% !important', 'max-height': '95vh !important', 'object-fit': 'contain' },
+  'img, svg, video': {
+    'max-width': '100% !important',
+    'max-height': '95vh !important',
+    'object-fit': 'contain',
+  },
   p: { hyphens: 'auto', '-webkit-hyphens': 'auto', orphans: '2', widows: '2' },
   a: { color: 'inherit !important', 'text-decoration-color': 'currentColor' },
 };
@@ -91,7 +96,9 @@ export class EpubReaderEngine implements ReaderEngine {
       this.location = location;
       this.emitPosition();
     });
-    rendition.on('selected', (cfiRange: string, contents: Contents) => this.emitSelection(cfiRange, contents));
+    rendition.on('selected', (cfiRange: string, contents: Contents) =>
+      this.emitSelection(cfiRange, contents),
+    );
     rendition.on('keyup', (event: KeyboardEvent) => this.handleKey(event));
     rendition.on('click', (event: MouseEvent) => this.handleTap(event));
     this.bindSwipe(rendition);
@@ -124,7 +131,9 @@ export class EpubReaderEngine implements ReaderEngine {
 
   async goToProgress(progress: number): Promise<void> {
     if (!this.locationsReady || !this.book) return;
-    await this.rendition?.display(this.book.locations.cfiFromPercentage(Math.min(Math.max(progress, 0), 1)));
+    await this.rendition?.display(
+      this.book.locations.cfiFromPercentage(Math.min(Math.max(progress, 0), 1)),
+    );
   }
 
   next(): void {
@@ -144,7 +153,11 @@ export class EpubReaderEngine implements ReaderEngine {
     const entries: TocEntry[] = [];
     const walk = (items: NavItem[], depth: number) =>
       items.forEach((item) => {
-        entries.push({ label: item.label.trim(), depth, locator: { kind: 'epub', cfi: item.href } });
+        entries.push({
+          label: item.label.trim(),
+          depth,
+          locator: { kind: 'epub', cfi: item.href },
+        });
         walk(item.subitems ?? [], depth + 1);
       });
     walk(navigation?.toc ?? [], 0);
@@ -194,7 +207,8 @@ export class EpubReaderEngine implements ReaderEngine {
     const cfi = new this.lib.EpubCFI();
     try {
       return (
-        cfi.compare(locator.cfi, this.location.start.cfi) >= 0 && cfi.compare(locator.cfi, this.location.end.cfi) <= 0
+        cfi.compare(locator.cfi, this.location.start.cfi) >= 0 &&
+        cfi.compare(locator.cfi, this.location.end.cfi) <= 0
       );
     } catch {
       return false;
@@ -223,7 +237,12 @@ export class EpubReaderEngine implements ReaderEngine {
     const go = () => (direction === 'next' ? rendition.next() : rendition.prev());
     const style = this.appearance?.pageAnimation ?? 'slide';
     const atEdge = direction === 'next' ? this.location?.atEnd : this.location?.atStart;
-    if (!stage || style === 'none' || atEdge || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (
+      !stage ||
+      style === 'none' ||
+      atEdge ||
+      matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
       await go();
       return;
     }
@@ -232,8 +251,14 @@ export class EpubReaderEngine implements ReaderEngine {
     const [exit, enter] =
       style === 'slide'
         ? [
-            [{ transform: 'none', opacity: 1 }, { transform: `translateX(${shift}px)`, opacity: 0 }],
-            [{ transform: `translateX(${-shift}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
+            [
+              { transform: 'none', opacity: 1 },
+              { transform: `translateX(${shift}px)`, opacity: 0 },
+            ],
+            [
+              { transform: `translateX(${-shift}px)`, opacity: 0 },
+              { transform: 'none', opacity: 1 },
+            ],
           ]
         : [
             [{ opacity: 1 }, { opacity: 0 }],
@@ -312,7 +337,8 @@ export class EpubReaderEngine implements ReaderEngine {
     if (!target) return '';
     const find = (items: NavItem[]): NavItem | undefined => {
       for (const item of items) {
-        if (item.href.split('#')[0].endsWith(target) || target.endsWith(item.href.split('#')[0])) return item;
+        if (item.href.split('#')[0].endsWith(target) || target.endsWith(item.href.split('#')[0]))
+          return item;
         const child = find(item.subitems ?? []);
         if (child) return child;
       }
@@ -351,7 +377,12 @@ export class EpubReaderEngine implements ReaderEngine {
       locator: { kind: 'epub', cfi: cfiRange },
       position: progress,
       label: this.placementLabel(progress, this.location?.start.href),
-      anchor: new DOMRect(rect.left + (frame?.left ?? 0), rect.top + (frame?.top ?? 0), rect.width, rect.height),
+      anchor: new DOMRect(
+        rect.left + (frame?.left ?? 0),
+        rect.top + (frame?.top ?? 0),
+        rect.width,
+        rect.height,
+      ),
     });
   }
 }

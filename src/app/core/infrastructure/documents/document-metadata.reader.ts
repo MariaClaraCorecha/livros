@@ -17,7 +17,9 @@ export class DocumentMetadataReader extends BookMetadataReader {
     try {
       const { info } = (await pdf.getMetadata()) as { info: { Title?: string; Author?: string } };
       const page = await pdf.getPage(1);
-      const viewport = page.getViewport({ scale: COVER_WIDTH / page.getViewport({ scale: 1 }).width });
+      const viewport = page.getViewport({
+        scale: COVER_WIDTH / page.getViewport({ scale: 1 }).width,
+      });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;

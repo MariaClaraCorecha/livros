@@ -14,7 +14,9 @@
   flex: none;
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 10px 30px -12px rgb(0 0 0 / 0.25);
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.12),
+    0 10px 30px -12px rgb(0 0 0 / 0.25);
   overflow: hidden;
   --scale-round-x: 1px;
   --scale-round-y: 1px;

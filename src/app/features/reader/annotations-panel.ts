@@ -22,7 +22,16 @@ import { EmptyState } from '../../shared/ui/empty-state';
 /** Painel lateral com destaques, marcadores e sumário do livro. */
 @Component({
   selector: 'app-annotations-panel',
-  imports: [DatePipe, MatButtonModule, MatIconModule, MatMenuModule, MatTabsModule, MatTooltipModule, ColorSwatches, EmptyState],
+  imports: [
+    DatePipe,
+    MatButtonModule,
+    MatIconModule,
+    MatMenuModule,
+    MatTabsModule,
+    MatTooltipModule,
+    ColorSwatches,
+    EmptyState,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './annotations-panel.html',
   styleUrl: './annotations-panel.scss',

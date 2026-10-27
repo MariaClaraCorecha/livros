@@ -4,18 +4,8 @@ import { ChangeDetectionStrategy, Component, computed, effect, input } from '@an
 @Component({
   selector: 'app-audio-clip',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<audio controls preload="metadata" [src]="url()"></audio>`,
-  styles: `
-    :host {
-      display: block;
-    }
-    audio {
-      inline-size: 100%;
-      max-inline-size: 360px;
-      block-size: 40px;
-      border-radius: 999px;
-    }
-  `,
+  templateUrl: './audio-clip.html',
+  styleUrl: './audio-clip.scss',
 })
 export class AudioClip {
   readonly blob = input.required<Blob>();

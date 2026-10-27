@@ -1,4 +1,9 @@
-import { EnvironmentProviders, inject, makeEnvironmentProviders, provideAppInitializer } from '@angular/core';
+import {
+  EnvironmentProviders,
+  inject,
+  makeEnvironmentProviders,
+  provideAppInitializer,
+} from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { AppearanceService } from './application/appearance.service';
 import {

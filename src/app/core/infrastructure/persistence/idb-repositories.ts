@@ -43,7 +43,11 @@ export class IdbBookRepository extends BookRepository {
 
   async remove(id: string): Promise<void> {
     const tx = (await this.db).transaction(['books', 'files'], 'readwrite');
-    await Promise.all([tx.objectStore('books').delete(id), tx.objectStore('files').delete(id), tx.done]);
+    await Promise.all([
+      tx.objectStore('books').delete(id),
+      tx.objectStore('files').delete(id),
+      tx.done,
+    ]);
   }
 }
 

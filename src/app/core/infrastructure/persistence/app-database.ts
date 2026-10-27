@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
-import { Book, Bookmark, Highlight, LEGACY_SHELF_EMOJI_ICONS, Shelf, SHELF_ICONS, UserProfile } from '../../domain';
+import {
+  Book,
+  Bookmark,
+  Highlight,
+  LEGACY_SHELF_EMOJI_ICONS,
+  Shelf,
+  SHELF_ICONS,
+  UserProfile,
+} from '../../domain';
 
 interface LeitorSchema extends DBSchema {
   books: { key: string; value: Book; indexes: { ownerId: string } };
@@ -36,7 +44,11 @@ export class AppDatabase {
         let cursor = await transaction.objectStore('shelves').openCursor();
         while (cursor) {
           const { emoji, ...shelf } = cursor.value as Shelf & { emoji?: string };
-          if (!shelf.icon) await cursor.update({ ...shelf, icon: LEGACY_SHELF_EMOJI_ICONS[emoji ?? ''] ?? SHELF_ICONS[0] });
+          if (!shelf.icon)
+            await cursor.update({
+              ...shelf,
+              icon: LEGACY_SHELF_EMOJI_ICONS[emoji ?? ''] ?? SHELF_ICONS[0],
+            });
           cursor = await cursor.continue();
         }
       }

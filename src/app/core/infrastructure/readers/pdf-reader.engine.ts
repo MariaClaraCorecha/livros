@@ -61,7 +61,9 @@ export class PdfReaderEngine implements ReaderEngine {
     this.scale = this.fitScale();
 
     host.classList.add('pdf-reader');
-    this.pages = Array.from({ length: this.pdf.numPages }, (_, index) => this.createPage(index + 1));
+    this.pages = Array.from({ length: this.pdf.numPages }, (_, index) =>
+      this.createPage(index + 1),
+    );
     host.replaceChildren(...this.pages.map((page) => page.el));
     this.setHighlights(this.highlights);
     this.observePages();
@@ -147,7 +149,14 @@ export class PdfReaderEngine implements ReaderEngine {
     const textLayer = document.createElement('div');
     textLayer.className = 'textLayer';
     el.append(highlightLayer, textLayer);
-    const page: PageView = { number, el, textLayer, highlightLayer, renderedScale: 0, rendering: false };
+    const page: PageView = {
+      number,
+      el,
+      textLayer,
+      highlightLayer,
+      renderedScale: 0,
+      rendering: false,
+    };
     this.applySize(page);
     return page;
   }
@@ -197,7 +206,11 @@ export class PdfReaderEngine implements ReaderEngine {
       view.el.querySelector('canvas')?.remove();
       view.el.prepend(canvas);
       view.textLayer.replaceChildren();
-      await new TextLayer({ textContentSource: page.streamTextContent(), container: view.textLayer, viewport }).render();
+      await new TextLayer({
+        textContentSource: page.streamTextContent(),
+        container: view.textLayer,
+        viewport,
+      }).render();
       view.renderedScale = scale;
     } catch {
       // Renderização cancelada (documento fechado durante o carregamento).
@@ -219,7 +232,9 @@ export class PdfReaderEngine implements ReaderEngine {
     this.scale = this.fitScale();
     this.pages.forEach((page) => this.applySize(page));
     this.scrollToPage(anchor);
-    this.pages.filter((page) => this.isNearViewport(page)).forEach((page) => void this.renderPage(page));
+    this.pages
+      .filter((page) => this.isNearViewport(page))
+      .forEach((page) => void this.renderPage(page));
   }
 
   private isNearViewport(page: PageView): boolean {
@@ -241,12 +256,16 @@ export class PdfReaderEngine implements ReaderEngine {
     const emitSelection = debounce(() => this.emitSelection(), 250);
     this.disposables.add(() => emitSelection.cancel());
 
-    this.disposables.listen(this.host, 'scroll', () => this.updateCurrentFromScroll(), { passive: true });
+    this.disposables.listen(this.host, 'scroll', () => this.updateCurrentFromScroll(), {
+      passive: true,
+    });
     this.disposables.listen(document, 'selectionchange', () => {
       if (document.getSelection()?.isCollapsed) this.events.selection(null);
       else emitSelection();
     });
-    this.disposables.listen<MouseEvent>(this.host, 'click', (event) => this.detectHighlightClick(event));
+    this.disposables.listen<MouseEvent>(this.host, 'click', (event) =>
+      this.detectHighlightClick(event),
+    );
 
     const resize = debounce(() => this.relayout(), 150);
     let lastWidth = this.host.clientWidth;

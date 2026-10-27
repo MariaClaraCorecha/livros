@@ -1,11 +1,20 @@
-<input #fileInput type="file" hidden multiple [accept]="accept" (change)="onFilesSelected(fileInput)" />
+<input
+  #fileInput
+  type="file"
+  hidden
+  multiple
+  [accept]="accept"
+  (change)="onFilesSelected(fileInput)"
+/>
 
 <header class="page-head">
   @if (shelf(); as current) {
     <div class="shelf-title" [style.--shelf]="current.color">
       <mat-icon class="shelf-icon">{{ current.icon }}</mat-icon>
       <div>
-        <p class="eyebrow">Biblioteca · {{ current.count }} {{ current.count === 1 ? 'livro' : 'livros' }}</p>
+        <p class="eyebrow">
+          Biblioteca · {{ current.count }} {{ current.count === 1 ? 'livro' : 'livros' }}
+        </p>
         <h1 class="brand-title">{{ current.name }}</h1>
         @if (current.description) {
           <p class="muted description">{{ current.description }}</p>
@@ -13,13 +22,24 @@
       </div>
     </div>
     <div class="head-actions">
-      <button mat-stroked-button (click)="manageShelfBooks()"><mat-icon>library_add_check</mat-icon>Gerenciar livros</button>
-      <button mat-icon-button [matMenuTriggerFor]="shelfMenu" aria-label="Opções da biblioteca"><mat-icon>more_vert</mat-icon></button>
+      <button mat-stroked-button (click)="manageShelfBooks()">
+        <mat-icon>library_add_check</mat-icon>Gerenciar livros
+      </button>
+      <button mat-icon-button [matMenuTriggerFor]="shelfMenu" aria-label="Opções da biblioteca">
+        <mat-icon>more_vert</mat-icon>
+      </button>
       <mat-menu #shelfMenu xPosition="before">
         <button mat-menu-item (click)="editShelf()"><mat-icon>edit</mat-icon>Editar</button>
-        <button mat-menu-item (click)="deleteShelf()"><mat-icon>delete</mat-icon>Excluir biblioteca</button>
+        <button mat-menu-item (click)="deleteShelf()">
+          <mat-icon>delete</mat-icon>Excluir biblioteca
+        </button>
       </mat-menu>
-      <button mat-flat-button class="add-button" (click)="fileInput.click()" [disabled]="importing()">
+      <button
+        mat-flat-button
+        class="add-button"
+        (click)="fileInput.click()"
+        [disabled]="importing()"
+      >
         <mat-icon>add</mat-icon>Adicionar livros
       </button>
     </div>
@@ -41,7 +61,9 @@
     [attr.aria-current]="shelf() ? null : 'page'"
     [class.active]="!shelf()"
   >
-    <mat-icon class="chip-icon">home</mat-icon>Todos os livros<span class="count">{{ books().length }}</span>
+    <mat-icon class="chip-icon">home</mat-icon>Todos os livros<span class="count">{{
+      books().length
+    }}</span>
   </a>
   @for (item of shelves(); track item.id) {
     <a
@@ -52,7 +74,8 @@
       [class.active]="shelf()?.id === item.id"
       [attr.aria-current]="shelf()?.id === item.id ? 'page' : null"
     >
-      <mat-icon class="chip-icon">{{ item.icon }}</mat-icon>{{ item.name }}<span class="count">{{ item.count }}</span>
+      <mat-icon class="chip-icon">{{ item.icon }}</mat-icon
+      >{{ item.name }}<span class="count">{{ item.count }}</span>
     </a>
   }
   <button type="button" class="shelf-chip new" (click)="createShelf()">
@@ -74,7 +97,9 @@
       <h2>{{ book.title }}</h2>
       <p class="muted">{{ book.author }}</p>
       <div class="continue-progress">
-        <span class="track"><span class="fill" [style.inline-size.%]="book.progress * 100"></span></span>
+        <span class="track"
+          ><span class="fill" [style.inline-size.%]="book.progress * 100"></span
+        ></span>
         {{ book.progress | percent }}
       </div>
     </div>
@@ -86,10 +111,19 @@
   <div class="toolbar">
     <mat-form-field class="search">
       <mat-icon matPrefix>search</mat-icon>
-      <input matInput placeholder="Buscar por título ou autor" [value]="query()" (input)="query.set($any($event.target).value)" />
+      <input
+        matInput
+        placeholder="Buscar por título ou autor"
+        [value]="query()"
+        (input)="query.set($any($event.target).value)"
+      />
     </mat-form-field>
 
-    <mat-chip-listbox aria-label="Formato" [value]="format()" (change)="format.set($event.value ?? 'all')">
+    <mat-chip-listbox
+      aria-label="Formato"
+      [value]="format()"
+      (change)="format.set($event.value ?? 'all')"
+    >
       <mat-chip-option value="all">Todos</mat-chip-option>
       <mat-chip-option value="pdf">PDF</mat-chip-option>
       <mat-chip-option value="epub">EPUB</mat-chip-option>
@@ -106,7 +140,12 @@
         (newShelf)="createShelf($event)"
       />
     } @empty {
-      <app-empty-state class="full" icon="search_off" title="Nada encontrado" message="Tente outro termo ou formato." />
+      <app-empty-state
+        class="full"
+        icon="search_off"
+        title="Nada encontrado"
+        message="Tente outro termo ou formato."
+      />
     }
   </section>
 } @else if (shelf()) {
@@ -117,9 +156,13 @@
   >
     <div class="empty-actions">
       @if (books().length) {
-        <button mat-flat-button (click)="manageShelfBooks()"><mat-icon>library_add_check</mat-icon>Escolher livros</button>
+        <button mat-flat-button (click)="manageShelfBooks()">
+          <mat-icon>library_add_check</mat-icon>Escolher livros
+        </button>
       }
-      <button mat-stroked-button (click)="fileInput.click()"><mat-icon>upload_file</mat-icon>Enviar arquivos</button>
+      <button mat-stroked-button (click)="fileInput.click()">
+        <mat-icon>upload_file</mat-icon>Enviar arquivos
+      </button>
     </div>
   </app-empty-state>
 } @else if (!loading()) {
@@ -128,7 +171,9 @@
     title="Sua estante está vazia"
     message="Adicione arquivos PDF ou EPUB — ou arraste-os para esta página."
   >
-    <button mat-flat-button (click)="fileInput.click()"><mat-icon>upload_file</mat-icon>Escolher arquivos</button>
+    <button mat-flat-button (click)="fileInput.click()">
+      <mat-icon>upload_file</mat-icon>Escolher arquivos
+    </button>
   </app-empty-state>
 }
 
@@ -137,7 +182,10 @@
     <mat-icon>file_download</mat-icon>
     Solte seus PDFs e EPUBs aqui
     @if (shelf(); as current) {
-      <small><mat-icon>{{ current.icon }}</mat-icon>Eles entrarão em {{ current.name }}</small>
+      <small
+        ><mat-icon>{{ current.icon }}</mat-icon
+        >Eles entrarão em {{ current.name }}</small
+      >
     }
   </div>
 }

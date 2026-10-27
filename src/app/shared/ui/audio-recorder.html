@@ -1,0 +1,17 @@
+@if (recording()) {
+  <button mat-flat-button type="button" class="recording" (click)="stop()">
+    <mat-icon class="filled">stop_circle</mat-icon>
+    {{ elapsed() | duration }}
+  </button>
+} @else {
+  <button
+    mat-icon-button
+    type="button"
+    [matTooltip]="error() ?? 'Gravar áudio'"
+    [disabled]="!supported"
+    (click)="start()"
+    aria-label="Gravar áudio"
+  >
+    <mat-icon [class.error]="error()">mic</mat-icon>
+  </button>
+}

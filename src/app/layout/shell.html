@@ -7,14 +7,20 @@
   <nav class="desktop-nav" aria-label="Principal">
     @for (link of links; track link.path) {
       <a mat-button [routerLink]="link.path" routerLinkActive="active">
-        <mat-icon>{{ link.icon }}</mat-icon>{{ link.label }}
+        <mat-icon>{{ link.icon }}</mat-icon
+        >{{ link.label }}
       </a>
     }
   </nav>
 
   <span class="spacer"></span>
 
-  <button mat-icon-button (click)="cycleScheme()" matTooltip="Alternar tema" aria-label="Alternar tema">
+  <button
+    mat-icon-button
+    (click)="cycleScheme()"
+    matTooltip="Alternar tema"
+    aria-label="Alternar tema"
+  >
     <mat-icon>{{ schemeIcon() }}</mat-icon>
   </button>
 
@@ -45,7 +51,9 @@
 <nav class="bottom-nav" aria-label="Principal">
   @for (link of links; track link.path) {
     <a [routerLink]="link.path" routerLinkActive="active" #rla="routerLinkActive">
-      <span class="pill"><mat-icon [class.filled]="rla.isActive">{{ link.icon }}</mat-icon></span>
+      <span class="pill"
+        ><mat-icon [class.filled]="rla.isActive">{{ link.icon }}</mat-icon></span
+      >
       {{ link.label }}
     </a>
   }

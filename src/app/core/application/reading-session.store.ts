@@ -46,12 +46,16 @@ export class ReadingSessionStore {
 
   async saveProgress(placement: LocatorPlacement): Promise<void> {
     const book = this.book();
-    if (book) this.book.set(await this.library.saveProgress(book, placement.locator, placement.position));
+    if (book)
+      this.book.set(await this.library.saveProgress(book, placement.locator, placement.position));
   }
 
   // ---------- Destaques ----------
 
-  async addHighlight(placement: LocatorPlacement & { text: string }, color: HighlightColor): Promise<Highlight> {
+  async addHighlight(
+    placement: LocatorPlacement & { text: string },
+    color: HighlightColor,
+  ): Promise<Highlight> {
     const book = this.requireBook();
     const now = Date.now();
     const highlight: Highlight = {
@@ -90,7 +94,10 @@ export class ReadingSessionStore {
   }
 
   removeComment(highlight: Highlight, commentId: string): Promise<Highlight> {
-    return this.saveHighlight({ ...highlight, comments: highlight.comments.filter((c) => c.id !== commentId) });
+    return this.saveHighlight({
+      ...highlight,
+      comments: highlight.comments.filter((c) => c.id !== commentId),
+    });
   }
 
   async removeHighlight(id: string): Promise<void> {

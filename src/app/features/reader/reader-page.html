@@ -20,7 +20,12 @@
 
   <mat-sidenav-content class="main">
     <header class="bar">
-      <a mat-icon-button routerLink="/biblioteca" matTooltip="Biblioteca" aria-label="Voltar para a biblioteca">
+      <a
+        mat-icon-button
+        routerLink="/biblioteca"
+        matTooltip="Biblioteca"
+        aria-label="Voltar para a biblioteca"
+      >
         <mat-icon>arrow_back</mat-icon>
       </a>
       <div class="title">
@@ -30,16 +35,31 @@
 
       @if (supportsZoom()) {
         <div class="zoom">
-          <button mat-icon-button (click)="zoom(1 / 1.15)" matTooltip="Diminuir zoom" aria-label="Diminuir zoom">
+          <button
+            mat-icon-button
+            (click)="zoom(1 / 1.15)"
+            matTooltip="Diminuir zoom"
+            aria-label="Diminuir zoom"
+          >
             <mat-icon>zoom_out</mat-icon>
           </button>
-          <button mat-icon-button (click)="zoom(1.15)" matTooltip="Aumentar zoom" aria-label="Aumentar zoom">
+          <button
+            mat-icon-button
+            (click)="zoom(1.15)"
+            matTooltip="Aumentar zoom"
+            aria-label="Aumentar zoom"
+          >
             <mat-icon>zoom_in</mat-icon>
           </button>
         </div>
       }
 
-      <button mat-icon-button [matMenuTriggerFor]="settings" matTooltip="Aparência" aria-label="Aparência da leitura">
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="settings"
+        matTooltip="Aparência"
+        aria-label="Aparência da leitura"
+      >
         <mat-icon>text_format</mat-icon>
       </button>
 
@@ -93,12 +113,24 @@
     </div>
 
     <footer class="footer">
-      <button mat-icon-button (click)="prev()" [disabled]="!ready()" aria-label="Anterior"><mat-icon>chevron_left</mat-icon></button>
-      <mat-slider class="seek" min="0" max="100" step="1" discrete [disabled]="!ready()" aria-label="Progresso">
+      <button mat-icon-button (click)="prev()" [disabled]="!ready()" aria-label="Anterior">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <mat-slider
+        class="seek"
+        min="0"
+        max="100"
+        step="1"
+        discrete
+        [disabled]="!ready()"
+        aria-label="Progresso"
+      >
         <input matSliderThumb [value]="progress()" (valueChange)="seek($event)" />
       </mat-slider>
       <span class="label">{{ position()?.label }}</span>
-      <button mat-icon-button (click)="next()" [disabled]="!ready()" aria-label="Próxima"><mat-icon>chevron_right</mat-icon></button>
+      <button mat-icon-button (click)="next()" [disabled]="!ready()" aria-label="Próxima">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
     </footer>
   </mat-sidenav-content>
 </mat-sidenav-container>
@@ -115,7 +147,11 @@
 <mat-menu #settings xPosition="before" class="reader-settings">
   <div class="settings" (click)="$event.stopPropagation()">
     <span class="settings-label">Tema</span>
-    <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().theme" (change)="setTheme($event.value)">
+    <mat-button-toggle-group
+      hideSingleSelectionIndicator
+      [value]="appearance().theme"
+      (change)="setTheme($event.value)"
+    >
       <mat-button-toggle value="paper">Papel</mat-button-toggle>
       <mat-button-toggle value="sepia">Sépia</mat-button-toggle>
       <mat-button-toggle value="night">Noturno</mat-button-toggle>
@@ -127,20 +163,32 @@
 
       <span class="settings-label">Tamanho do texto</span>
       <div class="font-size">
-        <button mat-icon-button (click)="changeFontSize(-10)" aria-label="Diminuir fonte"><mat-icon>text_decrease</mat-icon></button>
+        <button mat-icon-button (click)="changeFontSize(-10)" aria-label="Diminuir fonte">
+          <mat-icon>text_decrease</mat-icon>
+        </button>
         <strong>{{ appearance().fontSize }}%</strong>
-        <button mat-icon-button (click)="changeFontSize(10)" aria-label="Aumentar fonte"><mat-icon>text_increase</mat-icon></button>
+        <button mat-icon-button (click)="changeFontSize(10)" aria-label="Aumentar fonte">
+          <mat-icon>text_increase</mat-icon>
+        </button>
       </div>
 
       <span class="settings-label">Espaçamento entre linhas</span>
-      <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().lineHeight" (change)="setLineHeight($event.value)">
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        [value]="appearance().lineHeight"
+        (change)="setLineHeight($event.value)"
+      >
         @for (option of lineHeights; track option.value) {
           <mat-button-toggle [value]="option.value">{{ option.label }}</mat-button-toggle>
         }
       </mat-button-toggle-group>
 
       <span class="settings-label">Virar página</span>
-      <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().pageAnimation" (change)="setPageAnimation($event.value)">
+      <mat-button-toggle-group
+        hideSingleSelectionIndicator
+        [value]="appearance().pageAnimation"
+        (change)="setPageAnimation($event.value)"
+      >
         @for (option of pageAnimations; track option.value) {
           <mat-button-toggle [value]="option.value">{{ option.label }}</mat-button-toggle>
         }
@@ -151,7 +199,9 @@
 
 <mat-menu #bookmarkMenu xPosition="before">
   <div class="settings" (click)="$event.stopPropagation()">
-    <span class="settings-label">{{ currentBookmark() ? 'Cor do marcador' : 'Marcar esta página' }}</span>
+    <span class="settings-label">{{
+      currentBookmark() ? 'Cor do marcador' : 'Marcar esta página'
+    }}</span>
     <app-color-swatches
       label="Cor do marcador"
       [options]="bookmarkColors"
@@ -160,6 +210,8 @@
     />
   </div>
   @if (currentBookmark(); as bookmark) {
-    <button mat-menu-item (click)="removeBookmark(bookmark)"><mat-icon>bookmark_remove</mat-icon>Remover marcador</button>
+    <button mat-menu-item (click)="removeBookmark(bookmark)">
+      <mat-icon>bookmark_remove</mat-icon>Remover marcador
+    </button>
   }
 </mat-menu>

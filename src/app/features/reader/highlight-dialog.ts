@@ -1,7 +1,20 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -52,12 +65,18 @@ export class HighlightDialog {
   private readonly textarea = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
 
   protected readonly colors = HIGHLIGHT_COLORS;
-  protected readonly highlight = computed(() => this.store.highlights().find((h) => h.id === this.data.highlightId));
-  protected readonly hex = computed(() => colorHex(HIGHLIGHT_COLORS, this.highlight()?.color ?? 'yellow'));
+  protected readonly highlight = computed(() =>
+    this.store.highlights().find((h) => h.id === this.data.highlightId),
+  );
+  protected readonly hex = computed(() =>
+    colorHex(HIGHLIGHT_COLORS, this.highlight()?.color ?? 'yellow'),
+  );
   protected readonly draft = signal('');
   protected readonly audio = signal<RecordedAudio | null>(null);
   protected readonly sending = signal(false);
-  protected readonly canSend = computed(() => !this.sending() && (!!this.draft().trim() || !!this.audio()));
+  protected readonly canSend = computed(
+    () => !this.sending() && (!!this.draft().trim() || !!this.audio()),
+  );
 
   protected recolor(highlight: Highlight, color: HighlightColor): void {
     void this.store.recolorHighlight(highlight, color);

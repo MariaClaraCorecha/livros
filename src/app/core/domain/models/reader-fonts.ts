@@ -25,12 +25,22 @@ export const READER_FONTS: readonly ReaderFontOption[] = [
   { id: 'serif', label: 'Georgia', hint: 'Clássica', family: SERIF },
   { id: 'merriweather', label: 'Merriweather', hint: 'Robusta', family: `Merriweather, ${SERIF}` },
   { id: 'lora', label: 'Lora', hint: 'Elegante', family: `Lora, ${SERIF}` },
-  { id: 'source-serif', label: 'Source Serif', hint: 'Editorial', family: `"Source Serif 4", ${SERIF}` },
+  {
+    id: 'source-serif',
+    label: 'Source Serif',
+    hint: 'Editorial',
+    family: `"Source Serif 4", ${SERIF}`,
+  },
   { id: 'sans', label: 'Sistema', hint: 'Sem serifa', family: SANS },
   { id: 'inter', label: 'Inter', hint: 'Moderna', family: `Inter, ${SANS}` },
   { id: 'nunito', label: 'Nunito', hint: 'Arredondada', family: `Nunito, ${SANS}` },
   { id: 'lexend', label: 'Lexend', hint: 'Leitura fluida', family: `Lexend, ${SANS}` },
-  { id: 'atkinson', label: 'Atkinson', hint: 'Alta legibilidade', family: `"Atkinson Hyperlegible", ${SANS}` },
+  {
+    id: 'atkinson',
+    label: 'Atkinson',
+    hint: 'Alta legibilidade',
+    family: `"Atkinson Hyperlegible", ${SANS}`,
+  },
 ];
 
 /** Uma única folha do Google Fonts: o navegador só baixa os arquivos das fontes realmente usadas. */

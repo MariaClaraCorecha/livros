@@ -1,0 +1,28 @@
+<div class="colors" [class.expanded]="expanded()">
+  @for (color of visibleColors(); track color.id) {
+    <button
+      type="button"
+      class="dot"
+      [style.--dot]="color.hex"
+      [attr.aria-label]="'Destacar em ' + color.label"
+      [matTooltip]="color.label"
+      (click)="highlight.emit(color.id)"
+    ></button>
+  }
+</div>
+<span class="divider"></span>
+<button
+  mat-icon-button
+  [matTooltip]="expanded() ? 'Menos cores' : 'Mais cores'"
+  [attr.aria-label]="expanded() ? 'Menos cores' : 'Mais cores'"
+  [attr.aria-expanded]="expanded()"
+  (click)="expanded.set(!expanded())"
+>
+  <mat-icon>{{ expanded() ? 'unfold_less' : 'palette' }}</mat-icon>
+</button>
+<button mat-icon-button matTooltip="Comentar" aria-label="Comentar" (click)="comment.emit()">
+  <mat-icon>add_comment</mat-icon>
+</button>
+<button mat-icon-button matTooltip="Copiar" aria-label="Copiar" (click)="copy.emit()">
+  <mat-icon>content_copy</mat-icon>
+</button>

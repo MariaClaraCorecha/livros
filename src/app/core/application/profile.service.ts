@@ -18,7 +18,9 @@ export class ProfileService {
 
   readonly profile = this.current.asReadonly();
   readonly avatar = computed(() => this.current()?.avatar ?? this.auth.user()?.picture);
-  readonly displayName = computed(() => this.current()?.displayName || this.auth.user()?.name || '');
+  readonly displayName = computed(
+    () => this.current()?.displayName || this.auth.user()?.name || '',
+  );
 
   constructor() {
     effect(() => {

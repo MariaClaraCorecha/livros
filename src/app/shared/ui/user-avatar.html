@@ -1,0 +1,5 @@
+@if (src() && !failed()) {
+  <img [src]="src()" alt="" referrerpolicy="no-referrer" (error)="failed.set(true)" />
+} @else {
+  <span aria-hidden="true">{{ letters() }}</span>
+}

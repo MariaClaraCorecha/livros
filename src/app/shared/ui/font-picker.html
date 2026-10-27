@@ -1,0 +1,15 @@
+@for (font of fonts; track font.id) {
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="font.id === selected()"
+    [style.font-family]="font.family"
+    (click)="selectedChange.emit(font.id)"
+  >
+    <span class="sample">Aa</span>
+    <span class="name">{{ font.label }}</span>
+    @if (!compact()) {
+      <span class="hint">{{ font.hint }}</span>
+    }
+  </button>
+}

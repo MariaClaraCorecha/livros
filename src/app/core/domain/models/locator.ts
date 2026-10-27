@@ -8,8 +8,7 @@ export interface NormalizedRect {
 
 /** Endereço de um ponto ou trecho dentro de um documento, independente do formato. */
 export type Locator =
-  | { kind: 'pdf'; page: number; rects?: NormalizedRect[] }
-  | { kind: 'epub'; cfi: string };
+  { kind: 'pdf'; page: number; rects?: NormalizedRect[] } | { kind: 'epub'; cfi: string };
 
 /** Posição exibível de um locator: progresso (0–1) e rótulo legível. */
 export interface LocatorPlacement {

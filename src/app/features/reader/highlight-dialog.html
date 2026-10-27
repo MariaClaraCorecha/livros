@@ -3,7 +3,12 @@
     <mat-icon class="filled" [style.color]="hex()">format_quote</mat-icon>
     <span class="label">{{ item.label }}</span>
     <span class="spacer"></span>
-    <button mat-icon-button matTooltip="Excluir destaque" aria-label="Excluir destaque" (click)="remove(item)">
+    <button
+      mat-icon-button
+      matTooltip="Excluir destaque"
+      aria-label="Excluir destaque"
+      (click)="remove(item)"
+    >
       <mat-icon>delete</mat-icon>
     </button>
     <button mat-icon-button mat-dialog-close aria-label="Fechar"><mat-icon>close</mat-icon></button>
@@ -23,11 +28,21 @@
       <span class="spacer"></span>
       <div class="reactions">
         @for (emoji of item.reactions; track emoji) {
-          <button type="button" class="reaction" [attr.aria-label]="'Remover reação ' + emoji" (click)="react(item, emoji)">
+          <button
+            type="button"
+            class="reaction"
+            [attr.aria-label]="'Remover reação ' + emoji"
+            (click)="react(item, emoji)"
+          >
             {{ emoji }}
           </button>
         }
-        <button mat-icon-button [matMenuTriggerFor]="reactionMenu" matTooltip="Reagir" aria-label="Adicionar reação">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="reactionMenu"
+          matTooltip="Reagir"
+          aria-label="Adicionar reação"
+        >
           <mat-icon>add_reaction</mat-icon>
         </button>
       </div>
@@ -50,13 +65,19 @@
           }
           <footer>
             <span class="muted">{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-            <button mat-icon-button aria-label="Excluir comentário" (click)="removeComment(item, comment.id)">
+            <button
+              mat-icon-button
+              aria-label="Excluir comentário"
+              (click)="removeComment(item, comment.id)"
+            >
               <mat-icon>close</mat-icon>
             </button>
           </footer>
         </article>
       } @empty {
-        <p class="muted empty">Nenhum comentário ainda. Escreva algo, use emojis ou grave um áudio.</p>
+        <p class="muted empty">
+          Nenhum comentário ainda. Escreva algo, use emojis ou grave um áudio.
+        </p>
       }
     </section>
   </mat-dialog-content>
@@ -65,7 +86,9 @@
     @if (audio(); as recorded) {
       <div class="pending">
         <app-audio-clip [blob]="recorded.blob" />
-        <button mat-icon-button aria-label="Descartar áudio" (click)="audio.set(null)"><mat-icon>delete</mat-icon></button>
+        <button mat-icon-button aria-label="Descartar áudio" (click)="audio.set(null)">
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
     }
     <mat-form-field>
@@ -82,7 +105,12 @@
       ></textarea>
     </mat-form-field>
     <div class="actions">
-      <button mat-icon-button [matMenuTriggerFor]="emojiMenu" matTooltip="Emojis" aria-label="Inserir emoji">
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="emojiMenu"
+        matTooltip="Emojis"
+        aria-label="Inserir emoji"
+      >
         <mat-icon>mood</mat-icon>
       </button>
       <mat-menu #emojiMenu>
