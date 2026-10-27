@@ -79,7 +79,11 @@ export class PdfReaderEngine implements ReaderEngine {
   }
 
   async goToProgress(progress: number): Promise<void> {
-    this.scrollToPage(Math.round(progress * this.pages.length));
+    this.scrollToPage(Math.floor(progress * this.pages.length) + 1);
+  }
+
+  async goToPage(page: number): Promise<void> {
+    this.scrollToPage(page);
   }
 
   next(): void {
@@ -296,7 +300,8 @@ export class PdfReaderEngine implements ReaderEngine {
     const total = this.pages.length;
     this.events.position({
       locator: { kind: 'pdf', page: this.current },
-      position: this.current / total,
+      // Primeira página = 0%, última = 100% (assim o livro conta como concluído).
+      position: total > 1 ? (this.current - 1) / (total - 1) : 1,
       label: `Página ${this.current} de ${total}`,
       page: this.current,
       totalPages: total,
