@@ -9,6 +9,7 @@ import {
   READER_FONTS_STYLESHEET,
   readerFont,
   ReaderEvents,
+  ReaderPosition,
   ReaderTheme,
   TocEntry,
 } from '../../domain';
@@ -132,10 +133,22 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   async goToProgress(progress: number): Promise<void> {
-    if (!this.locationsReady || !this.book) return;
-    await this.rendition?.display(
-      this.book.locations.cfiFromPercentage(Math.min(Math.max(progress, 0), 1)),
-    );
+    const book = this.book;
+    if (!book) return;
+    const clamped = Math.min(Math.max(progress, 0), 1);
+    // Enquanto as localizações não ficam prontas, salta para o capítulo proporcional.
+    const target = this.locationsReady
+      ? book.locations.cfiFromPercentage(clamped)
+      : book.spine.get(Math.min(Math.floor(clamped * this.chapterCount()), this.chapterCount() - 1))
+          ?.href;
+    await this.rendition?.display(target);
+  }
+
+  async goToPage(page: number): Promise<void> {
+    const locations = this.book?.locations;
+    if (!this.locationsReady || !locations) return;
+    const index = Math.min(Math.max(page - 1, 0), locations.length() - 1);
+    await this.rendition?.display(locations.cfiFromLocation(index));
   }
 
   next(): void {
@@ -327,12 +340,52 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   private progressOf(cfi: string): number {
-    if (!this.locationsReady || !this.book) return this.location?.start.percentage ?? 0;
+    if (!this.locationsReady || !this.book) return this.estimatedProgress();
     try {
       return this.book.locations.percentageFromCfi(cfi);
     } catch {
-      return this.location?.start.percentage ?? 0;
+      return this.estimatedProgress();
     }
+  }
+
+  /** Estimativa pelo capítulo atual e pela página dentro dele (antes das localizações). */
+  private estimatedProgress(): number {
+    const start = this.location?.start;
+    if (!start) return 0;
+    const { page, total } = start.displayed;
+    return Math.min((start.index + (page - 1) / Math.max(total, 1)) / this.chapterCount(), 1);
+  }
+
+  private chapterCount(): number {
+    return (this.book?.spine.last()?.index ?? 0) + 1;
+  }
+
+  /**
+   * "Páginas" do livro: cada localização gerada tem ~1200 caracteres, mais ou menos uma página
+   * impressa. Fica indefinido até as localizações ficarem prontas.
+   */
+  private visiblePages(): Pick<ReaderPosition, 'page' | 'lastPage' | 'totalPages'> {
+    const location = this.location;
+    const totalPages = this.book?.locations.length() ?? 0;
+    if (!this.locationsReady || !location || !totalPages) return {};
+    return {
+      page: this.pageAt(location.start.cfi, totalPages),
+      lastPage: location.atEnd ? totalPages : this.pageAt(location.end.cfi, totalPages),
+      totalPages,
+    };
+  }
+
+  /**
+   * Página (1..total) que contém o CFI. `locationFromCfi` devolve o índice do primeiro trecho que
+   * começa no CFI ou depois dele; logo, o CFI está no trecho anterior, salvo se cair no início exato.
+   */
+  private pageAt(cfi: string, totalPages: number): number {
+    const locations = this.book!.locations;
+    const index = locations.locationFromCfi(cfi) as unknown as number;
+    const exact =
+      index < totalPages &&
+      new this.lib.EpubCFI().compare(locations.cfiFromLocation(index), cfi) === 0;
+    return Math.min(Math.max(index + (exact ? 1 : 0), 1), totalPages);
   }
 
   private chapterLabel(href?: string): string {
@@ -364,6 +417,7 @@ export class EpubReaderEngine implements ReaderEngine {
       locator: { kind: 'epub', cfi: start.cfi },
       position: progress,
       label: this.placementLabel(progress, start.href),
+      ...this.visiblePages(),
     });
   }
 
