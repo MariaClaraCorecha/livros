@@ -142,3 +142,20 @@
 .epub-highlight {
   cursor: pointer;
 }
+
+// O SVG dos destaques fica por cima do texto: "multiply" tinge sem apagar as letras.
+// No tema noturno (fundo escuro), multiply escureceria o destaque, então fica o padrão.
+.viewport:not([data-theme='night'] *) .epub-highlight {
+  mix-blend-mode: multiply;
+}
+
+// Pulso curto ao navegar até um destaque pelo painel.
+.reader-flash {
+  animation: reader-flash 0.6s ease-in-out 3;
+}
+
+@keyframes reader-flash {
+  50% {
+    opacity: 0.25;
+  }
+}

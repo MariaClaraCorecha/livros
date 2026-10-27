@@ -11,6 +11,7 @@
       [bookmarks]="bookmarks()"
       [toc]="toc()"
       (navigate)="goTo($event)"
+      (goToHighlight)="goToHighlight($event)"
       (openHighlight)="openHighlight($event)"
       (recolorBookmark)="recolorBookmark($event)"
       (removeBookmark)="removeBookmark($event)"
@@ -95,6 +96,25 @@
         <button mat-icon-button class="turn next" (click)="next()" aria-label="Próxima página">
           <mat-icon>arrow_forward_ios</mat-icon>
         </button>
+      }
+
+      @if (readingSpot(); as spot) {
+        <div class="reading-spot" role="status">
+          <button type="button" class="return" (click)="returnToReadingSpot()">
+            <mat-icon>u_turn_left</mat-icon>
+            <span class="text">
+              <strong>Voltar para onde eu estava</strong>
+              <span>{{ spot.label }}</span>
+            </span>
+          </button>
+          <button
+            mat-icon-button
+            aria-label="Dispensar marcação de leitura"
+            (click)="readingSpot.set(null)"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
       }
 
       @if (currentBookmarkHex(); as ribbon) {

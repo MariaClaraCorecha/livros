@@ -33,6 +33,7 @@ import {
   Bookmark,
   BookmarkColor,
   colorHex,
+  Highlight,
   HighlightColor,
   Locator,
   ReaderEngine,
@@ -115,6 +116,8 @@ export class ReaderPage {
   protected readonly toc = signal<TocEntry[]>([]);
   protected readonly panelOpen = signal(false);
   protected readonly lastColor = signal<HighlightColor>('yellow');
+  /** Onde a leitura estava antes de pular pelo painel, para voltar sem se perder no livro. */
+  protected readonly readingSpot = signal<ReaderPosition | null>(null);
 
   protected readonly wide = toSignal(
     inject(BreakpointObserver)
@@ -204,6 +207,7 @@ export class ReaderPage {
           position: (position) => {
             this.position.set(position);
             this.persistProgress(position);
+            this.dismissSpotIfVisible();
           },
           selection: (selection) => {
             this.selection.set(selection);
@@ -248,9 +252,31 @@ export class ReaderPage {
     }
   }
 
-  protected goTo(locator: Locator): void {
-    void this.engine?.goTo(locator);
+  /** Navegação pelo painel (destaques, marcadores, sumário): guarda o ponto de leitura antes. */
+  protected async goTo(locator: Locator): Promise<void> {
+    if (!this.readingSpot()) this.readingSpot.set(this.position());
     if (!this.wide()) this.panelOpen.set(false);
+    await this.engine?.goTo(locator);
+  }
+
+  protected async goToHighlight(highlight: Highlight): Promise<void> {
+    await this.goTo(highlight.locator);
+    this.engine?.flashHighlight(highlight.id);
+  }
+
+  protected async returnToReadingSpot(): Promise<void> {
+    const spot = this.readingSpot();
+    this.readingSpot.set(null);
+    if (spot) await this.engine?.goTo(spot.locator);
+  }
+
+  /**
+   * Chamado a cada mudança de posição: se o usuário voltou ao ponto de leitura por conta própria,
+   * não há mais para onde voltar. (Logo após `goTo` não serve: o EPUB ainda informa a tela antiga.)
+   */
+  private dismissSpotIfVisible(): void {
+    const spot = this.readingSpot();
+    if (spot && this.engine?.isVisible(spot.locator)) this.readingSpot.set(null);
   }
 
   protected onKeydown(event: KeyboardEvent): void {
