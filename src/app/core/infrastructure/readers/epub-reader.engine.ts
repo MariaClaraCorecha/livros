@@ -148,7 +148,11 @@ export class EpubReaderEngine implements ReaderEngine {
     const locations = this.book?.locations;
     if (!this.locationsReady || !locations) return;
     const index = Math.min(Math.max(page - 1, 0), locations.length() - 1);
-    await this.rendition?.display(locations.cfiFromLocation(index));
+    // A localização é um intervalo; o epub.js posiciona pelo retângulo do intervalo inteiro,
+    // que pode abranger colunas anteriores. Reduzido ao ponto inicial, cai na tela certa.
+    const start = new this.lib.EpubCFI(locations.cfiFromLocation(index));
+    start.collapse(true);
+    await this.rendition?.display(start.toString());
   }
 
   next(): void {
