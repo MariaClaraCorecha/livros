@@ -61,14 +61,14 @@
 }
 .b4 {
   block-size: 185px;
-  background: #d9a441;
+  background: var(--mat-sys-tertiary-container);
   animation-delay: 240ms;
   transform: rotate(-8deg);
   transform-origin: bottom left;
 }
 .b5 {
   block-size: 120px;
-  background: #c96f6f;
+  background: var(--mat-sys-primary-fixed-dim);
   animation-delay: 320ms;
   margin-inline-start: 18px;
 }
@@ -137,8 +137,9 @@ blockquote {
   inline-size: 64px;
   block-size: 64px;
   border-radius: 20px;
-  background: var(--mat-sys-primary);
-  color: var(--mat-sys-on-primary);
+  background: var(--app-gradient);
+  color: var(--app-on-gradient);
+  box-shadow: 0 12px 28px -12px var(--mat-sys-primary);
 
   mat-icon {
     font-size: 34px;
