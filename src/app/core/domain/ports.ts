@@ -63,6 +63,8 @@ export interface ReaderEngine {
   zoom(factor: number): void;
   tableOfContents(): Promise<TocEntry[]>;
   setHighlights(highlights: readonly Highlight[]): void;
+  /** Pisca o destaque na tela, para o usuário achá-lo depois de navegar até ele. */
+  flashHighlight(id: string): void;
   setAppearance(appearance: ReaderAppearance): void;
   /** Indica se o locator está na área visível atualmente. */
   isVisible(locator: Locator): boolean;
