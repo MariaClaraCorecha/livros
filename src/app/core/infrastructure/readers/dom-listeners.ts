@@ -24,4 +24,17 @@ export class Disposables {
   }
 }
 
+/** Aplica uma animação curta de destaque (`.reader-flash`, em _reader-engines.scss). */
+export function flash(elements: Iterable<Element>): void {
+  for (const element of elements) {
+    element.classList.remove('reader-flash');
+    // Força o reinício da animação se o mesmo destaque piscar duas vezes seguidas.
+    void (element as HTMLElement).getBoundingClientRect();
+    element.classList.add('reader-flash');
+    element.addEventListener('animationend', () => element.classList.remove('reader-flash'), {
+      once: true,
+    });
+  }
+}
+
 export const normalizeText = (text: string) => text.replace(/\s+/g, ' ').trim();
