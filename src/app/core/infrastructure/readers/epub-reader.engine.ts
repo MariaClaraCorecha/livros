@@ -13,7 +13,7 @@ import {
   ReaderTheme,
   TocEntry,
 } from '../../domain';
-import { debounce, Disposables, normalizeText } from './dom-listeners';
+import { debounce, Disposables, flash, normalizeText } from './dom-listeners';
 
 type EpubModule = typeof import('epubjs');
 
@@ -205,16 +205,24 @@ export class EpubReaderEngine implements ReaderEngine {
     }
   }
 
+  flashHighlight(id: string): void {
+    // O epub.js copia os dados do destaque ({ id }) para atributos data-* do <g> do SVG.
+    flash(this.host?.querySelectorAll(`g.epub-highlight[data-id="${CSS.escape(id)}"]`) ?? []);
+  }
+
   setAppearance(appearance: ReaderAppearance): void {
+    const reflows = this.appearance !== undefined && changesLayout(this.appearance, appearance);
     this.appearance = appearance;
     const themes = this.rendition?.themes;
     if (!themes) return;
+    const place = this.location?.start.cfi;
     const palette = THEMES[appearance.theme];
     themes.override('background', palette.background, true);
     themes.override('color', palette.color, true);
     themes.override('--reader-font', readerFont(appearance.font).family);
     themes.override('--reader-line-height', String(appearance.lineHeight));
     themes.fontSize(`${appearance.fontSize}%`);
+    if (reflows && place) void this.keepPlace(place);
   }
 
   isVisible(locator: Locator): boolean {
@@ -237,17 +245,35 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   /**
-   * Exibe o alvo (CFI ou href). Ao abrir outro capítulo, o epub.js escolhe a coluna antes de o
-   * texto terminar de se acomodar (fontes e tema), e a tela fica algumas páginas antes do alvo.
-   * Nesse caso, espera o layout assentar e exibe de novo.
+   * Exibe o alvo (CFI ou href). Ao abrir outro capítulo ou repaginar, o epub.js escolhe a coluna
+   * antes de o texto terminar de se acomodar (fontes e tema), e a tela fica algumas páginas antes
+   * do alvo. Nesse caso, exibe de novo. A nova posição só é informada no quadro seguinte ao
+   * `display()`, por isso esperamos o layout assentar antes de conferir.
    */
   private async display(target?: string): Promise<void> {
     const rendition = this.rendition;
     if (!rendition) return;
     await rendition.display(target);
-    if (!target?.startsWith('epubcfi(') || this.isOnScreen(target)) return;
+    if (!target?.startsWith('epubcfi(')) return;
     await this.layoutSettled();
-    if (!this.destroyed) await rendition.display(target);
+    if (!this.destroyed && !this.isOnScreen(target)) await rendition.display(target);
+  }
+
+  /**
+   * Fonte, tamanho e espaçamento refluem o texto: sem isso, a tela mudaria de trecho e os
+   * destaques ficariam desenhados nas posições antigas (o epub.js só os redesenha ao redimensionar).
+   */
+  private async keepPlace(cfi: string): Promise<void> {
+    await this.layoutSettled();
+    if (this.destroyed) return;
+    await this.display(cfi);
+    this.repaintHighlights();
+  }
+
+  private repaintHighlights(): void {
+    const views = this.rendition?.views() as unknown as
+      { all(): { pane?: { render(): void } }[] } | undefined;
+    views?.all().forEach((view) => view.pane?.render());
   }
 
   private async layoutSettled(): Promise<void> {
@@ -320,9 +346,21 @@ export class EpubReaderEngine implements ReaderEngine {
     }
   }
 
+  /**
+   * Ao redimensionar (janela, painel lateral), o epub.js repagina e costuma voltar algumas páginas.
+   * Guardamos o trecho de antes da primeira mudança e voltamos a ele depois de repaginar.
+   */
   private observeResize(host: HTMLElement): void {
-    const resize = debounce(() => this.rendition?.resize(host.clientWidth, host.clientHeight), 150);
-    const observer = new ResizeObserver(() => resize());
+    let place: string | undefined;
+    const resize = debounce(() => {
+      this.rendition?.resize(host.clientWidth, host.clientHeight);
+      if (place) void this.keepPlace(place);
+      place = undefined;
+    }, 150);
+    const observer = new ResizeObserver(() => {
+      place ??= this.location?.start.cfi;
+      resize();
+    });
     observer.observe(host);
     this.disposables.add(() => {
       resize.cancel();
@@ -467,3 +505,9 @@ export class EpubReaderEngine implements ReaderEngine {
     });
   }
 }
+
+/** Mudanças de aparência que refluem o texto (o tema só troca cores). */
+const changesLayout = (before: ReaderAppearance, after: ReaderAppearance): boolean =>
+  before.font !== after.font ||
+  before.fontSize !== after.fontSize ||
+  before.lineHeight !== after.lineHeight;
