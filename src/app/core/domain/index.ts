@@ -1,5 +1,6 @@
 export * from './models/annotation';
 export * from './models/book';
+export * from './models/book-query';
 export * from './models/colors';
 export * from './models/locator';
 export * from './models/reader-fonts';
