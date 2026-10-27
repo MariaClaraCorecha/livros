@@ -48,9 +48,17 @@
       <p class="eyebrow">Olá, {{ firstName() }} <mat-icon class="wave">waving_hand</mat-icon></p>
       <h1 class="brand-title">Sua biblioteca</h1>
     </div>
-    <button mat-flat-button class="add-button" (click)="fileInput.click()" [disabled]="importing()">
-      <mat-icon>add</mat-icon>Adicionar livros
-    </button>
+    <!-- Com a estante vazia, o estado vazio já oferece o botão de adicionar. -->
+    @if (books().length) {
+      <button
+        mat-flat-button
+        class="add-button"
+        (click)="fileInput.click()"
+        [disabled]="importing()"
+      >
+        <mat-icon>add</mat-icon>Adicionar livros
+      </button>
+    }
   }
 </header>
 
@@ -83,7 +91,12 @@
   </button>
 </nav>
 
-@if (importing() || loading()) {
+@if (importProgress(); as progress) {
+  <div class="import-status" role="status">
+    <span>Importando {{ progress.done + 1 }} de {{ progress.total }}…</span>
+    <mat-progress-bar mode="determinate" [value]="(progress.done / progress.total) * 100" />
+  </div>
+} @else if (loading()) {
   <mat-progress-bar mode="indeterminate" class="loading" />
 }
 
@@ -112,22 +125,48 @@
     <mat-form-field class="search">
       <mat-icon matPrefix>search</mat-icon>
       <input
+        #search
         matInput
         placeholder="Buscar por título ou autor"
-        [value]="query()"
-        (input)="query.set($any($event.target).value)"
+        aria-keyshortcuts="/"
+        [value]="filters().text"
+        (input)="patchFilters({ text: $any($event.target).value })"
       />
+      @if (filters().text) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Limpar busca"
+          (click)="patchFilters({ text: '' })"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      } @else {
+        <kbd matSuffix class="shortcut" aria-hidden="true">/</kbd>
+      }
     </mat-form-field>
 
     <mat-chip-listbox
       aria-label="Formato"
-      [value]="format()"
-      (change)="format.set($event.value ?? 'all')"
+      [value]="filters().format"
+      (change)="patchFilters({ format: $event.value ?? 'all' })"
     >
       <mat-chip-option value="all">Todos</mat-chip-option>
       <mat-chip-option value="pdf">PDF</mat-chip-option>
       <mat-chip-option value="epub">EPUB</mat-chip-option>
     </mat-chip-listbox>
+
+    <button mat-button class="sort" [matMenuTriggerFor]="sortMenu" aria-label="Ordenar livros">
+      <mat-icon>swap_vert</mat-icon><span class="sort-label">{{ sortLabel() }}</span>
+    </button>
+    <mat-menu #sortMenu xPosition="before">
+      @for (sort of sorts; track sort.id) {
+        <button mat-menu-item (click)="patchFilters({ sort: sort.id })">
+          <mat-icon>{{ filters().sort === sort.id ? 'check' : sort.icon }}</mat-icon
+          >{{ sort.label }}
+        </button>
+      }
+    </mat-menu>
   </div>
 
   <section class="grid" aria-label="Livros">
@@ -145,7 +184,13 @@
         icon="search_off"
         title="Nada encontrado"
         message="Tente outro termo ou formato."
-      />
+      >
+        @if (hasFilters()) {
+          <button mat-stroked-button (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>Limpar filtros
+          </button>
+        }
+      </app-empty-state>
     }
   </section>
 } @else if (shelf()) {

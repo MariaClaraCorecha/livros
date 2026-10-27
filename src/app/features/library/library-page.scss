@@ -225,6 +225,31 @@
   max-inline-size: 460px;
 }
 
+.shortcut {
+  margin-inline-end: 12px;
+  padding: 1px 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-block-end-width: 2px;
+  border-radius: 6px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+}
+
+.sort {
+  margin-inline-start: auto;
+}
+
+.import-status {
+  display: grid;
+  gap: 6px;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+
+  mat-progress-bar {
+    border-radius: 999px;
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -270,7 +295,22 @@
   }
 }
 
+// Sem teclado físico (celular/tablet), a dica do atalho "/" não faz sentido.
+@media (hover: none) {
+  .shortcut {
+    display: none;
+  }
+}
+
 @media (max-width: 720px) {
+  // No celular, o botão de ordenar fica só com o ícone para caber ao lado dos filtros.
+  .sort-label {
+    display: none;
+  }
+
+  .sort mat-icon {
+    margin: 0;
+  }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
     gap: 20px 14px;

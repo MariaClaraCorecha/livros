@@ -7,6 +7,7 @@ import {
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -21,14 +22,20 @@ import { Router, RouterLink } from '@angular/router';
 import { LibraryService } from '../../core/application/library.service';
 import { ProfileService } from '../../core/application/profile.service';
 import { ShelfService } from '../../core/application/shelf.service';
-import { Book, BookFormat } from '../../core/domain';
+import {
+  Book,
+  BOOK_SORTS,
+  BookQuery,
+  DEFAULT_BOOK_QUERY,
+  isFiltered,
+  queryBooks,
+} from '../../core/domain';
 import { confirmAction } from '../../shared/ui/confirm-dialog';
+import { isTyping } from '../../shared/utils/keyboard';
 import { EmptyState } from '../../shared/ui/empty-state';
 import { BookCard } from './book-card';
 import { openShelfBooksDialog } from './shelf-books-dialog';
 import { openShelfDialog } from './shelf-dialog';
-
-type FormatFilter = BookFormat | 'all';
 
 @Component({
   selector: 'app-library-page',
@@ -52,6 +59,7 @@ type FormatFilter = BookFormat | 'all';
     '(dragover)': 'onDragOver($event)',
     '(dragleave)': 'onDragLeave($event)',
     '(drop)': 'onDrop($event)',
+    '(document:keydown)': 'onKeydown($event)',
   },
 })
 export class LibraryPage {
@@ -68,10 +76,17 @@ export class LibraryPage {
 
   protected readonly accept = '.pdf,.epub,application/pdf,application/epub+zip';
   protected readonly loading = this.library.loading;
-  protected readonly importing = signal(false);
+  protected readonly sorts = BOOK_SORTS;
+  /** Arquivos já processados na importação em andamento (`null` quando parada). */
+  protected readonly importProgress = signal<{ done: number; total: number } | null>(null);
+  protected readonly importing = computed(() => this.importProgress() !== null);
   protected readonly dragging = signal(false);
-  protected readonly query = signal('');
-  protected readonly format = signal<FormatFilter>('all');
+  protected readonly filters = signal<BookQuery>(DEFAULT_BOOK_QUERY);
+  protected readonly hasFilters = computed(() => isFiltered(this.filters()));
+  protected readonly sortLabel = computed(
+    () => BOOK_SORTS.find((sort) => sort.id === this.filters().sort)?.label,
+  );
+  private readonly search = viewChild<ElementRef<HTMLInputElement>>('search');
 
   protected readonly firstName = computed(() => this.profiles.displayName().split(' ')[0]);
   protected readonly books = this.library.library;
@@ -86,15 +101,24 @@ export class LibraryPage {
     const shelf = this.shelf();
     return shelf ? this.books().filter((book) => book.shelfIds?.includes(shelf.id)) : this.books();
   });
-  protected readonly filtered = computed(() => {
-    const query = this.query().trim().toLowerCase();
-    const format = this.format();
-    return this.shelfBooks().filter(
-      (book) =>
-        (format === 'all' || book.format === format) &&
-        (!query || `${book.title} ${book.author}`.toLowerCase().includes(query)),
-    );
-  });
+  protected readonly filtered = computed(() => queryBooks(this.shelfBooks(), this.filters()));
+
+  protected patchFilters(changes: Partial<BookQuery>): void {
+    this.filters.update((filters) => ({ ...filters, ...changes }));
+  }
+
+  protected clearFilters(): void {
+    this.patchFilters({ text: '', format: 'all' });
+  }
+
+  /** Atalho "/" para buscar, como em muitos apps de leitura e sites. */
+  protected onKeydown(event: KeyboardEvent): void {
+    if (event.key !== '/' || isTyping(event)) return;
+    const search = this.search()?.nativeElement;
+    if (!search) return;
+    event.preventDefault();
+    search.focus();
+  }
 
   // ---------- Livros ----------
 
@@ -176,9 +200,12 @@ export class LibraryPage {
 
   private async importFiles(files: File[]): Promise<void> {
     if (!files.length) return;
-    this.importing.set(true);
+    const total = files.length;
+    this.importProgress.set({ done: 0, total });
     try {
-      const { imported, rejected } = await this.library.import(files, this.shelf()?.id);
+      const { imported, rejected } = await this.library.import(files, this.shelf()?.id, (done) =>
+        this.importProgress.set({ done, total }),
+      );
       const parts = [];
       if (imported)
         parts.push(`${imported} ${imported === 1 ? 'livro adicionado' : 'livros adicionados'}`);
@@ -187,7 +214,7 @@ export class LibraryPage {
     } catch {
       this.snackBar.open('Não foi possível importar o arquivo.', 'OK');
     } finally {
-      this.importing.set(false);
+      this.importProgress.set(null);
     }
   }
 }
