@@ -18,7 +18,7 @@ export interface ShelfBooksData {
   imports: [MatButtonModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <h2 mat-dialog-title>{{ data.shelf.emoji }} Livros em “{{ data.shelf.name }}”</h2>
+    <h2 mat-dialog-title class="title"><mat-icon>{{ data.shelf.icon }}</mat-icon>Livros em “{{ data.shelf.name }}”</h2>
     <mat-dialog-content class="content">
       <mat-form-field>
         <mat-icon matPrefix>search</mat-icon>
@@ -55,6 +55,11 @@ export interface ShelfBooksData {
     </mat-dialog-actions>
   `,
   styles: `
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
     .content {
       display: flex;
       flex-direction: column;

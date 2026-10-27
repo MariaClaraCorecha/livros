@@ -5,11 +5,9 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angu
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
 import { firstValueFrom } from 'rxjs';
-import { SHELF_COLORS, SHELF_EMOJIS, ShelfDraft } from '../../core/domain';
+import { SHELF_COLORS, SHELF_ICONS, ShelfDraft } from '../../core/domain';
 import { ColorSwatches } from '../../shared/ui/color-swatches';
-import { EmojiPicker } from '../../shared/ui/emoji-picker';
 
 /** Formulário para criar ou editar uma biblioteca. */
 @Component({
@@ -21,9 +19,7 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatMenuModule,
     ColorSwatches,
-    EmojiPicker,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -31,7 +27,7 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
     <form [formGroup]="form" (ngSubmit)="save()">
       <mat-dialog-content class="content">
         <div class="preview" [style.--shelf]="form.controls.color.value">
-          <span class="emoji">{{ form.controls.emoji.value }}</span>
+          <mat-icon class="icon">{{ form.controls.icon.value }}</mat-icon>
           <div>
             <strong>{{ form.controls.name.value || 'Nome da biblioteca' }}</strong>
             <span>{{ form.controls.description.value || 'Organize seus livros por categoria' }}</span>
@@ -48,21 +44,18 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
         </mat-form-field>
 
         <span class="label">Ícone</span>
-        <div class="emojis" role="radiogroup" aria-label="Ícone">
-          @for (emoji of emojis; track emoji) {
+        <div class="icons" role="radiogroup" aria-label="Ícone">
+          @for (icon of icons; track icon) {
             <button
               type="button"
               role="radio"
-              [attr.aria-checked]="form.controls.emoji.value === emoji"
-              (click)="form.controls.emoji.setValue(emoji)"
+              [attr.aria-label]="icon"
+              [attr.aria-checked]="form.controls.icon.value === icon"
+              (click)="form.controls.icon.setValue(icon)"
             >
-              {{ emoji }}
+              <mat-icon [class.filled]="form.controls.icon.value === icon">{{ icon }}</mat-icon>
             </button>
           }
-          <button type="button" [matMenuTriggerFor]="more" aria-label="Mais emojis"><mat-icon>add_reaction</mat-icon></button>
-          <mat-menu #more>
-            <app-emoji-picker (picked)="form.controls.emoji.setValue($event)" />
-          </mat-menu>
         </div>
 
         <span class="label">Cor</span>
@@ -94,13 +87,15 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
       background: color-mix(in srgb, var(--shelf) 16%, var(--mat-sys-surface-container));
       border-inline-start: 6px solid var(--shelf);
     }
-    .preview .emoji {
+    .preview .icon {
       display: grid;
       place-items: center;
+      flex: none;
       inline-size: 48px;
       block-size: 48px;
       border-radius: 14px;
       background: color-mix(in srgb, var(--shelf) 28%, transparent);
+      color: var(--shelf);
       font-size: 26px;
     }
     .preview div {
@@ -119,12 +114,12 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
       font: var(--mat-sys-label-large);
       color: var(--mat-sys-on-surface-variant);
     }
-    .emojis {
+    .icons {
       display: grid;
       grid-template-columns: repeat(auto-fill, 40px);
       gap: 4px;
     }
-    .emojis button {
+    .icons button {
       display: grid;
       place-items: center;
       inline-size: 40px;
@@ -133,12 +128,12 @@ import { EmojiPicker } from '../../shared/ui/emoji-picker';
       border-radius: 12px;
       background: var(--mat-sys-surface-container);
       color: var(--mat-sys-on-surface-variant);
-      font-size: 20px;
       cursor: pointer;
     }
-    .emojis button[aria-checked='true'] {
+    .icons button[aria-checked='true'] {
       border-color: var(--mat-sys-primary);
       background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
     }
   `,
 })
@@ -147,12 +142,12 @@ export class ShelfDialog {
   private readonly initial = inject<ShelfDraft | null>(MAT_DIALOG_DATA);
 
   protected readonly editing = !!this.initial;
-  protected readonly emojis = SHELF_EMOJIS;
+  protected readonly icons = SHELF_ICONS;
   protected readonly colors = SHELF_COLORS;
   protected readonly form = inject(FormBuilder).nonNullable.group({
     name: [this.initial?.name ?? '', [Validators.required, Validators.maxLength(40)]],
     description: [this.initial?.description ?? '', Validators.maxLength(120)],
-    emoji: [this.initial?.emoji ?? SHELF_EMOJIS[0]],
+    icon: [this.initial?.icon ?? SHELF_ICONS[0]],
     color: [this.initial?.color ?? SHELF_COLORS[0].hex],
   });
 
