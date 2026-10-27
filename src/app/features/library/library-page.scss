@@ -27,7 +27,7 @@
   }
 }
 
-.shelf-emoji {
+.shelf-icon {
   display: grid;
   place-items: center;
   flex: none;
@@ -35,6 +35,7 @@
   block-size: 64px;
   border-radius: 20px;
   font-size: 34px;
+  color: var(--shelf);
   background: color-mix(in srgb, var(--shelf) 22%, var(--mat-sys-surface-container));
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--shelf) 45%, transparent);
 }
@@ -103,8 +104,18 @@
   }
 }
 
-.chip-emoji {
+.chip-icon {
+  font-size: 20px;
+  inline-size: 20px;
+  block-size: 20px;
+  color: var(--shelf);
+}
+
+.wave {
   font-size: 18px;
+  inline-size: 18px;
+  block-size: 18px;
+  vertical-align: -3px;
 }
 
 .empty-actions {
@@ -236,6 +247,19 @@
     font-size: 56px;
     inline-size: 56px;
     block-size: 56px;
+  }
+
+  small {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: var(--mat-sys-body-large);
+
+    mat-icon {
+      font-size: 20px;
+      inline-size: 20px;
+      block-size: 20px;
+    }
   }
 }
 

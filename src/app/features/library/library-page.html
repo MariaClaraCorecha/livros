@@ -3,7 +3,7 @@
 <header class="page-head">
   @if (shelf(); as current) {
     <div class="shelf-title" [style.--shelf]="current.color">
-      <span class="shelf-emoji">{{ current.emoji }}</span>
+      <mat-icon class="shelf-icon">{{ current.icon }}</mat-icon>
       <div>
         <p class="eyebrow">Biblioteca · {{ current.count }} {{ current.count === 1 ? 'livro' : 'livros' }}</p>
         <h1 class="brand-title">{{ current.name }}</h1>
@@ -25,7 +25,7 @@
     </div>
   } @else {
     <div>
-      <p class="eyebrow">Olá, {{ firstName() }} 👋</p>
+      <p class="eyebrow">Olá, {{ firstName() }} <mat-icon class="wave">waving_hand</mat-icon></p>
       <h1 class="brand-title">Sua biblioteca</h1>
     </div>
     <button mat-flat-button class="add-button" (click)="fileInput.click()" [disabled]="importing()">
@@ -41,7 +41,7 @@
     [attr.aria-current]="shelf() ? null : 'page'"
     [class.active]="!shelf()"
   >
-    <span class="chip-emoji">🏠</span>Todos os livros<span class="count">{{ books().length }}</span>
+    <mat-icon class="chip-icon">home</mat-icon>Todos os livros<span class="count">{{ books().length }}</span>
   </a>
   @for (item of shelves(); track item.id) {
     <a
@@ -52,7 +52,7 @@
       [class.active]="shelf()?.id === item.id"
       [attr.aria-current]="shelf()?.id === item.id ? 'page' : null"
     >
-      <span class="chip-emoji">{{ item.emoji }}</span>{{ item.name }}<span class="count">{{ item.count }}</span>
+      <mat-icon class="chip-icon">{{ item.icon }}</mat-icon>{{ item.name }}<span class="count">{{ item.count }}</span>
     </a>
   }
   <button type="button" class="shelf-chip new" (click)="createShelf()">
@@ -137,7 +137,7 @@
     <mat-icon>file_download</mat-icon>
     Solte seus PDFs e EPUBs aqui
     @if (shelf(); as current) {
-      <small>Eles entrarão em {{ current.emoji }} {{ current.name }}</small>
+      <small><mat-icon>{{ current.icon }}</mat-icon>Eles entrarão em {{ current.name }}</small>
     }
   </div>
 }
