@@ -101,6 +101,14 @@ export class EpubReaderEngine implements ReaderEngine {
     rendition.on('selected', (cfiRange: string, contents: Contents) =>
       this.emitSelection(cfiRange, contents),
     );
+    // O epub.js desenha os destaques assim que o capítulo é carregado, antes de fontes e tema
+    // acomodarem o texto; sem redesenhar, eles ficam nas posições antigas (fora da tela) ao
+    // navegar para outro capítulo pelo painel ou virando a página.
+    rendition.on('rendered', () =>
+      void this.layoutSettled().then(() => {
+        if (!this.destroyed) this.repaintHighlights();
+      }),
+    );
     rendition.on('keyup', (event: KeyboardEvent) => this.handleKey(event));
     rendition.on('click', (event: MouseEvent) => this.handleTap(event));
     this.bindSwipe(rendition);
