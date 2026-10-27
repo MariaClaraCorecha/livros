@@ -1,5 +1,6 @@
 @use 'sass:list';
 @use '@angular/material' as mat;
+@use './styles/palettes/aurora/theme-colors' as aurora;
 @use './styles/palettes/sage/theme-colors' as sage;
 @use './styles/palettes/ocean/theme-colors' as ocean;
 @use './styles/palettes/lavender/theme-colors' as lavanda;
@@ -8,6 +9,7 @@
 @use './styles/reader-engines';
 
 $palettes: (
+  'sage': sage.$primary-palette sage.$tertiary-palette,
   'ocean': ocean.$primary-palette ocean.$tertiary-palette,
   'lavender': lavanda.$primary-palette lavanda.$tertiary-palette,
   'rose': rose.$primary-palette rose.$tertiary-palette,
@@ -19,8 +21,8 @@ html {
   @include mat.theme(
     (
       color: (
-        primary: sage.$primary-palette,
-        tertiary: sage.$tertiary-palette,
+        primary: aurora.$primary-palette,
+        tertiary: aurora.$tertiary-palette,
       ),
       typography: (
         plain-family: (
@@ -61,6 +63,14 @@ html {
   --app-gutter: clamp(16px, 4vw, 40px);
   --app-max-width: 1240px;
   --app-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px -8px rgb(0 0 0 / 0.12);
+  // Gradiente da marca (primária → terciária), sempre saturado e com texto branco:
+  // no modo escuro os papéis primary/tertiary ficam claros, então usamos os "containers".
+  --app-gradient: linear-gradient(
+    135deg,
+    light-dark(var(--mat-sys-primary), var(--mat-sys-primary-container)),
+    light-dark(var(--mat-sys-tertiary), var(--mat-sys-tertiary-container))
+  );
+  --app-on-gradient: #fff;
 }
 
 @each $name, $pair in $palettes {
