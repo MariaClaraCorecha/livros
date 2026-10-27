@@ -15,6 +15,8 @@ export interface Shelf {
 export type ShelfDraft = Pick<Shelf, 'name' | 'description' | 'icon' | 'color'>;
 
 export const SHELF_COLORS: readonly ColorOption[] = [
+  { id: '#5b4bf5', label: 'Índigo', hex: '#5b4bf5' },
+  { id: '#d6337f', label: 'Framboesa', hex: '#d6337f' },
   { id: '#4c7a5a', label: 'Sálvia', hex: '#4c7a5a' },
   { id: '#3a6e9a', label: 'Oceano', hex: '#3a6e9a' },
   { id: '#7562a8', label: 'Lavanda', hex: '#7562a8' },
