@@ -116,18 +116,33 @@
       <button mat-icon-button (click)="prev()" [disabled]="!ready()" aria-label="Anterior">
         <mat-icon>chevron_left</mat-icon>
       </button>
+      @let range = seekRange();
       <mat-slider
         class="seek"
-        min="0"
-        max="100"
         step="1"
         discrete
+        [min]="range.min"
+        [max]="range.max"
+        [displayWith]="seekLabel"
         [disabled]="!ready()"
-        aria-label="Progresso"
+        [attr.aria-label]="pages() ? 'Página' : 'Progresso'"
       >
-        <input matSliderThumb [value]="progress()" (valueChange)="seek($event)" />
+        <!-- (change) só dispara ao soltar a barra ou usar o teclado, não a cada passo do arraste. -->
+        <input matSliderThumb [value]="range.value" (change)="seek(+$any($event.target).value)" />
       </mat-slider>
-      <span class="label">{{ position()?.label }}</span>
+      @if (book()?.format === 'epub') {
+        <span class="label">{{ position()?.label }}</span>
+      }
+      @if (pages(); as pages) {
+        <span class="pages">
+          <span class="current">
+            {{ pages.first }}{{ pages.last > pages.first ? '–' + pages.last : '' }}
+          </span>
+          de {{ pages.total }}
+        </span>
+      } @else if (ready()) {
+        <span class="pages">{{ progress() }}%</span>
+      }
       <button mat-icon-button (click)="next()" [disabled]="!ready()" aria-label="Próxima">
         <mat-icon>chevron_right</mat-icon>
       </button>

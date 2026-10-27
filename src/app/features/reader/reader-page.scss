@@ -163,6 +163,22 @@
   min-inline-size: 80px;
 }
 
+.pages {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-label-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  .current {
+    color: var(--mat-sys-on-surface);
+    font-weight: 600;
+  }
+}
+
 .label {
   flex: 0 1 auto;
   max-inline-size: 38%;

@@ -47,6 +47,7 @@ import {
   TocEntry,
 } from '../../core/domain';
 import { debounce } from '../../shared/utils/debounce';
+import { isTyping } from '../../shared/utils/keyboard';
 import { ColorSwatches } from '../../shared/ui/color-swatches';
 import { FontPicker } from '../../shared/ui/font-picker';
 import { AnnotationsPanel } from './annotations-panel';
@@ -125,6 +126,23 @@ export class ReaderPage {
     () => this.profiles.profile()?.reader ?? DEFAULT_READER_PREFERENCES,
   );
   protected readonly progress = computed(() => Math.round((this.position()?.position ?? 0) * 100));
+  /** Páginas visíveis e total, quando o motor sabe contar páginas (PDF; EPUB após indexar). */
+  protected readonly pages = computed(() => {
+    const { page, lastPage, totalPages } = this.position() ?? {};
+    return page && totalPages ? { first: page, last: lastPage ?? page, total: totalPages } : null;
+  });
+  /** Página escolhida na barra: a barra fica nela enquanto ela estiver na tela. */
+  private readonly requestedPage = signal<number | null>(null);
+  /** A barra percorre páginas quando há contagem; senão, porcentagem. */
+  protected readonly seekRange = computed(() => {
+    const pages = this.pages();
+    if (!pages) return { min: 0, max: 100, value: this.progress() };
+    const requested = this.requestedPage();
+    const visible = requested !== null && requested >= pages.first && requested <= pages.last;
+    return { min: 1, max: pages.total, value: visible ? requested : pages.first };
+  });
+  protected readonly seekLabel = (value: number): string =>
+    this.pages() ? String(value) : `${value}%`;
   protected readonly currentBookmark = computed(() => {
     this.position();
     return this.ready()
@@ -221,8 +239,13 @@ export class ReaderPage {
     this.engine?.zoom(factor);
   }
 
-  protected seek(percent: number): void {
-    void this.engine?.goToProgress(percent / 100);
+  protected seek(value: number): void {
+    if (this.pages()) {
+      this.requestedPage.set(value);
+      void this.engine?.goToPage(value);
+    } else {
+      void this.engine?.goToProgress(value / 100);
+    }
   }
 
   protected goTo(locator: Locator): void {
@@ -231,9 +254,7 @@ export class ReaderPage {
   }
 
   protected onKeydown(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement;
-    if (this.dialog.openDialogs.length || target.closest('input, textarea, [contenteditable]'))
-      return;
+    if (this.dialog.openDialogs.length || isTyping(event)) return;
     if (event.key === 'ArrowRight' || event.key === 'PageDown') this.next();
     else if (event.key === 'ArrowLeft' || event.key === 'PageUp') this.prev();
     else return;
