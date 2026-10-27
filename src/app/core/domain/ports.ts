@@ -53,6 +53,8 @@ export interface ReaderEngine {
   open(host: HTMLElement, file: Blob, events: ReaderEvents, start?: Locator): Promise<void>;
   goTo(locator: Locator): Promise<void>;
   goToProgress(progress: number): Promise<void>;
+  /** Vai para a página `page` (1..totalPages informado em `ReaderPosition`). */
+  goToPage(page: number): Promise<void>;
   next(): void;
   prev(): void;
   zoom(factor: number): void;
