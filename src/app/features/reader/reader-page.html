@@ -1,0 +1,165 @@
+<mat-sidenav-container class="reader" [attr.data-theme]="appearance().theme">
+  <mat-sidenav
+    position="end"
+    class="panel"
+    [mode]="wide() ? 'side' : 'over'"
+    [opened]="panelOpen()"
+    (closedStart)="panelOpen.set(false)"
+  >
+    <app-annotations-panel
+      [highlights]="highlights()"
+      [bookmarks]="bookmarks()"
+      [toc]="toc()"
+      (navigate)="goTo($event)"
+      (openHighlight)="openHighlight($event)"
+      (recolorBookmark)="recolorBookmark($event)"
+      (removeBookmark)="removeBookmark($event)"
+      (closed)="panelOpen.set(false)"
+    />
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main">
+    <header class="bar">
+      <a mat-icon-button routerLink="/biblioteca" matTooltip="Biblioteca" aria-label="Voltar para a biblioteca">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <div class="title">
+        <strong>{{ book()?.title ?? 'Carregando…' }}</strong>
+        <span>{{ book()?.author }}</span>
+      </div>
+
+      @if (supportsZoom()) {
+        <div class="zoom">
+          <button mat-icon-button (click)="zoom(1 / 1.15)" matTooltip="Diminuir zoom" aria-label="Diminuir zoom">
+            <mat-icon>zoom_out</mat-icon>
+          </button>
+          <button mat-icon-button (click)="zoom(1.15)" matTooltip="Aumentar zoom" aria-label="Aumentar zoom">
+            <mat-icon>zoom_in</mat-icon>
+          </button>
+        </div>
+      }
+
+      <button mat-icon-button [matMenuTriggerFor]="settings" matTooltip="Aparência" aria-label="Aparência da leitura">
+        <mat-icon>text_format</mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="bookmarkMenu"
+        [disabled]="!ready()"
+        [matTooltip]="currentBookmark() ? 'Página marcada' : 'Marcar página'"
+        aria-label="Marcador de página"
+      >
+        <mat-icon [class.filled]="currentBookmark()" [style.color]="currentBookmarkHex()">
+          {{ currentBookmark() ? 'bookmark' : 'bookmark_add' }}
+        </mat-icon>
+      </button>
+
+      <button
+        mat-icon-button
+        (click)="panelOpen.set(!panelOpen())"
+        matTooltip="Anotações e sumário"
+        aria-label="Anotações e sumário"
+      >
+        <mat-icon [class.filled]="panelOpen()">view_sidebar</mat-icon>
+      </button>
+    </header>
+
+    <div class="stage">
+      <div #viewport class="viewport"></div>
+
+      @if (ready() && !supportsZoom()) {
+        <button mat-icon-button class="turn prev" (click)="prev()" aria-label="Página anterior">
+          <mat-icon>arrow_back_ios_new</mat-icon>
+        </button>
+        <button mat-icon-button class="turn next" (click)="next()" aria-label="Próxima página">
+          <mat-icon>arrow_forward_ios</mat-icon>
+        </button>
+      }
+
+      @if (currentBookmarkHex(); as ribbon) {
+        <span class="ribbon" [style.--ribbon]="ribbon" aria-hidden="true"></span>
+      }
+      @if (loading()) {
+        <div class="state"><mat-spinner diameter="44" /> Abrindo livro…</div>
+      }
+      @if (error(); as message) {
+        <div class="state">
+          <mat-icon>error</mat-icon>
+          <p>{{ message }}</p>
+          <a mat-flat-button routerLink="/biblioteca">Voltar à biblioteca</a>
+        </div>
+      }
+    </div>
+
+    <footer class="footer">
+      <button mat-icon-button (click)="prev()" [disabled]="!ready()" aria-label="Anterior"><mat-icon>chevron_left</mat-icon></button>
+      <mat-slider class="seek" min="0" max="100" step="1" discrete [disabled]="!ready()" aria-label="Progresso">
+        <input matSliderThumb [value]="progress()" (valueChange)="seek($event)" />
+      </mat-slider>
+      <span class="label">{{ position()?.label }}</span>
+      <button mat-icon-button (click)="next()" [disabled]="!ready()" aria-label="Próxima"><mat-icon>chevron_right</mat-icon></button>
+    </footer>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+@if (selection(); as current) {
+  <app-selection-toolbar
+    [anchor]="current.anchor"
+    (highlight)="highlightSelection($event)"
+    (comment)="commentSelection()"
+    (copy)="copySelection()"
+  />
+}
+
+<mat-menu #settings xPosition="before" class="reader-settings">
+  <div class="settings" (click)="$event.stopPropagation()">
+    <span class="settings-label">Tema</span>
+    <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().theme" (change)="setTheme($event.value)">
+      <mat-button-toggle value="paper">Papel</mat-button-toggle>
+      <mat-button-toggle value="sepia">Sépia</mat-button-toggle>
+      <mat-button-toggle value="night">Noturno</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    @if (!supportsZoom()) {
+      <span class="settings-label">Fonte</span>
+      <app-font-picker compact [selected]="appearance().font" (selectedChange)="setFont($event)" />
+
+      <span class="settings-label">Tamanho do texto</span>
+      <div class="font-size">
+        <button mat-icon-button (click)="changeFontSize(-10)" aria-label="Diminuir fonte"><mat-icon>text_decrease</mat-icon></button>
+        <strong>{{ appearance().fontSize }}%</strong>
+        <button mat-icon-button (click)="changeFontSize(10)" aria-label="Aumentar fonte"><mat-icon>text_increase</mat-icon></button>
+      </div>
+
+      <span class="settings-label">Espaçamento entre linhas</span>
+      <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().lineHeight" (change)="setLineHeight($event.value)">
+        @for (option of lineHeights; track option.value) {
+          <mat-button-toggle [value]="option.value">{{ option.label }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+
+      <span class="settings-label">Virar página</span>
+      <mat-button-toggle-group hideSingleSelectionIndicator [value]="appearance().pageAnimation" (change)="setPageAnimation($event.value)">
+        @for (option of pageAnimations; track option.value) {
+          <mat-button-toggle [value]="option.value">{{ option.label }}</mat-button-toggle>
+        }
+      </mat-button-toggle-group>
+    }
+  </div>
+</mat-menu>
+
+<mat-menu #bookmarkMenu xPosition="before">
+  <div class="settings" (click)="$event.stopPropagation()">
+    <span class="settings-label">{{ currentBookmark() ? 'Cor do marcador' : 'Marcar esta página' }}</span>
+    <app-color-swatches
+      label="Cor do marcador"
+      [options]="bookmarkColors"
+      [selected]="currentBookmark()?.color"
+      (selectedChange)="setBookmark($event)"
+    />
+  </div>
+  @if (currentBookmark(); as bookmark) {
+    <button mat-menu-item (click)="removeBookmark(bookmark)"><mat-icon>bookmark_remove</mat-icon>Remover marcador</button>
+  }
+</mat-menu>

@@ -1,0 +1,142 @@
+// Estilos do DOM criado imperativamente pelos motores de leitura (fora do encapsulamento dos componentes).
+
+.pdf-reader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 48px;
+  overflow: auto;
+}
+
+.pdf-page {
+  position: relative;
+  flex: none;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12), 0 10px 30px -12px rgb(0 0 0 / 0.25);
+  overflow: hidden;
+  --scale-round-x: 1px;
+  --scale-round-y: 1px;
+
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.pdf-highlights {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.pdf-highlight {
+  position: absolute;
+  border-radius: 3px;
+  opacity: 0.55;
+}
+
+[data-theme='sepia'] .pdf-page {
+  background: #f4ecd8;
+
+  canvas {
+    filter: sepia(0.35) brightness(0.98);
+  }
+}
+
+[data-theme='night'] .pdf-page {
+  background: #1e1f22;
+
+  canvas {
+    filter: invert(0.9) hue-rotate(180deg);
+  }
+
+  .pdf-highlights {
+    mix-blend-mode: screen;
+  }
+
+  .pdf-highlight {
+    opacity: 0.35;
+  }
+}
+
+// Camada de texto do PDF.js (adaptada de pdfjs-dist/web/pdf_viewer.css).
+.textLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  text-align: initial;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+
+  :is(span, br) {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+  }
+
+  > :not(.markedContent),
+  .markedContent span:not(.markedContent) {
+    z-index: 1;
+    --font-height: 0;
+    font-size: calc(var(--text-scale-factor) * var(--font-height));
+    --scale-x: 1;
+    --rotate: 0deg;
+    transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+  }
+
+  .markedContent {
+    display: contents;
+  }
+
+  span[role='img'] {
+    user-select: none;
+    cursor: default;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--mat-sys-primary) 30%, transparent);
+    color: transparent;
+  }
+
+  br::selection {
+    background: transparent;
+  }
+
+  .endOfContent {
+    display: block;
+    position: absolute;
+    inset: 100% 0 0;
+    z-index: 0;
+    cursor: default;
+    user-select: none;
+  }
+
+  &.selecting .endOfContent {
+    top: 0;
+  }
+}
+
+.epub-stage {
+  position: absolute;
+  inset: clamp(20px, 4vh, 40px) clamp(16px, 4vw, 56px);
+}
+
+.epub-highlight {
+  cursor: pointer;
+}

@@ -1,0 +1,45 @@
+<section class="hero" aria-hidden="true">
+  <div class="shelf">
+    <span class="book b1"></span>
+    <span class="book b2"></span>
+    <span class="book b3"></span>
+    <span class="book b4"></span>
+    <span class="book b5"></span>
+  </div>
+  <blockquote>
+    “Um leitor vive mil vidas antes de morrer.”
+    <cite>— George R. R. Martin</cite>
+  </blockquote>
+</section>
+
+<section class="panel">
+  <div class="card">
+    <span class="logo"><mat-icon>auto_stories</mat-icon></span>
+    <h1 class="brand-title">Leitura</h1>
+    <p class="muted">Sua biblioteca pessoal, com anotações que têm voz.</p>
+
+    <ul class="features">
+      @for (feature of features; track feature.icon) {
+        <li><mat-icon>{{ feature.icon }}</mat-icon>{{ feature.text }}</li>
+      }
+    </ul>
+
+    <div class="google">
+      @if (loading()) {
+        <mat-spinner diameter="28" />
+      }
+      <div #googleButton></div>
+    </div>
+
+    @if (error(); as message) {
+      <p class="error"><mat-icon>info</mat-icon>{{ message }}</p>
+    }
+
+    @if (allowGuest) {
+      <button mat-stroked-button (click)="enterAsGuest()">
+        <mat-icon>person_outline</mat-icon>
+        Entrar como convidado
+      </button>
+    }
+  </div>
+</section>

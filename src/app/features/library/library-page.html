@@ -1,0 +1,143 @@
+<input #fileInput type="file" hidden multiple [accept]="accept" (change)="onFilesSelected(fileInput)" />
+
+<header class="page-head">
+  @if (shelf(); as current) {
+    <div class="shelf-title" [style.--shelf]="current.color">
+      <span class="shelf-emoji">{{ current.emoji }}</span>
+      <div>
+        <p class="eyebrow">Biblioteca · {{ current.count }} {{ current.count === 1 ? 'livro' : 'livros' }}</p>
+        <h1 class="brand-title">{{ current.name }}</h1>
+        @if (current.description) {
+          <p class="muted description">{{ current.description }}</p>
+        }
+      </div>
+    </div>
+    <div class="head-actions">
+      <button mat-stroked-button (click)="manageShelfBooks()"><mat-icon>library_add_check</mat-icon>Gerenciar livros</button>
+      <button mat-icon-button [matMenuTriggerFor]="shelfMenu" aria-label="Opções da biblioteca"><mat-icon>more_vert</mat-icon></button>
+      <mat-menu #shelfMenu xPosition="before">
+        <button mat-menu-item (click)="editShelf()"><mat-icon>edit</mat-icon>Editar</button>
+        <button mat-menu-item (click)="deleteShelf()"><mat-icon>delete</mat-icon>Excluir biblioteca</button>
+      </mat-menu>
+      <button mat-flat-button class="add-button" (click)="fileInput.click()" [disabled]="importing()">
+        <mat-icon>add</mat-icon>Adicionar livros
+      </button>
+    </div>
+  } @else {
+    <div>
+      <p class="eyebrow">Olá, {{ firstName() }} 👋</p>
+      <h1 class="brand-title">Sua biblioteca</h1>
+    </div>
+    <button mat-flat-button class="add-button" (click)="fileInput.click()" [disabled]="importing()">
+      <mat-icon>add</mat-icon>Adicionar livros
+    </button>
+  }
+</header>
+
+<nav class="shelves" aria-label="Bibliotecas">
+  <a
+    class="shelf-chip"
+    routerLink="/biblioteca"
+    [attr.aria-current]="shelf() ? null : 'page'"
+    [class.active]="!shelf()"
+  >
+    <span class="chip-emoji">🏠</span>Todos os livros<span class="count">{{ books().length }}</span>
+  </a>
+  @for (item of shelves(); track item.id) {
+    <a
+      class="shelf-chip"
+      routerLink="/biblioteca"
+      [queryParams]="{ estante: item.id }"
+      [style.--shelf]="item.color"
+      [class.active]="shelf()?.id === item.id"
+      [attr.aria-current]="shelf()?.id === item.id ? 'page' : null"
+    >
+      <span class="chip-emoji">{{ item.emoji }}</span>{{ item.name }}<span class="count">{{ item.count }}</span>
+    </a>
+  }
+  <button type="button" class="shelf-chip new" (click)="createShelf()">
+    <mat-icon>add</mat-icon>Nova biblioteca
+  </button>
+</nav>
+
+@if (importing() || loading()) {
+  <mat-progress-bar mode="indeterminate" class="loading" />
+}
+
+@if (continueReading(); as book) {
+  <a class="continue" [routerLink]="['/ler', book.id]">
+    @if (book.cover) {
+      <img [src]="book.cover" alt="" />
+    }
+    <div class="continue-text">
+      <span class="eyebrow">Continuar lendo</span>
+      <h2>{{ book.title }}</h2>
+      <p class="muted">{{ book.author }}</p>
+      <div class="continue-progress">
+        <span class="track"><span class="fill" [style.inline-size.%]="book.progress * 100"></span></span>
+        {{ book.progress | percent }}
+      </div>
+    </div>
+    <span class="go"><mat-icon>arrow_forward</mat-icon></span>
+  </a>
+}
+
+@if (shelfBooks().length) {
+  <div class="toolbar">
+    <mat-form-field class="search">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Buscar por título ou autor" [value]="query()" (input)="query.set($any($event.target).value)" />
+    </mat-form-field>
+
+    <mat-chip-listbox aria-label="Formato" [value]="format()" (change)="format.set($event.value ?? 'all')">
+      <mat-chip-option value="all">Todos</mat-chip-option>
+      <mat-chip-option value="pdf">PDF</mat-chip-option>
+      <mat-chip-option value="epub">EPUB</mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <section class="grid" aria-label="Livros">
+    @for (book of filtered(); track book.id) {
+      <app-book-card
+        [book]="book"
+        [shelves]="shelves()"
+        (remove)="remove($event)"
+        (toggleShelf)="toggleShelf($event)"
+        (newShelf)="createShelf($event)"
+      />
+    } @empty {
+      <app-empty-state class="full" icon="search_off" title="Nada encontrado" message="Tente outro termo ou formato." />
+    }
+  </section>
+} @else if (shelf()) {
+  <app-empty-state
+    icon="collections_bookmark"
+    title="Esta biblioteca está vazia"
+    message="Escolha livros que você já tem ou adicione novos arquivos direto aqui."
+  >
+    <div class="empty-actions">
+      @if (books().length) {
+        <button mat-flat-button (click)="manageShelfBooks()"><mat-icon>library_add_check</mat-icon>Escolher livros</button>
+      }
+      <button mat-stroked-button (click)="fileInput.click()"><mat-icon>upload_file</mat-icon>Enviar arquivos</button>
+    </div>
+  </app-empty-state>
+} @else if (!loading()) {
+  <app-empty-state
+    icon="library_books"
+    title="Sua estante está vazia"
+    message="Adicione arquivos PDF ou EPUB — ou arraste-os para esta página."
+  >
+    <button mat-flat-button (click)="fileInput.click()"><mat-icon>upload_file</mat-icon>Escolher arquivos</button>
+  </app-empty-state>
+}
+
+@if (dragging()) {
+  <div class="drop-overlay">
+    <mat-icon>file_download</mat-icon>
+    Solte seus PDFs e EPUBs aqui
+    @if (shelf(); as current) {
+      <small>Eles entrarão em {{ current.emoji }} {{ current.name }}</small>
+    }
+  </div>
+}

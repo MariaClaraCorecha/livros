@@ -1,0 +1,131 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: 8px;
+  padding-inline: var(--app-gutter);
+  background: color-mix(in srgb, var(--mat-sys-surface) 85%, transparent);
+  backdrop-filter: blur(14px);
+  border-block-end: 1px solid var(--mat-sys-outline-variant);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+  margin-inline-end: 24px;
+  font-size: 22px;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 12px;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+}
+
+.desktop-nav {
+  display: flex;
+  gap: 4px;
+
+  a {
+    border-radius: 999px;
+
+    mat-icon {
+      margin-inline-end: 6px;
+    }
+  }
+
+  .active {
+    background: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+  }
+}
+
+.avatar-button {
+  border: 0;
+  padding: 0;
+  margin-inline-start: 4px;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.account-head {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 12px;
+  gap: 2px;
+}
+
+.content {
+  flex: 1;
+  inline-size: 100%;
+  max-inline-size: var(--app-max-width);
+  margin-inline: auto;
+  padding: 24px var(--app-gutter) 48px;
+}
+
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .desktop-nav {
+    display: none;
+  }
+
+  .content {
+    padding-block-end: 104px;
+  }
+
+  .bottom-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+    background: var(--mat-sys-surface-container);
+    border-block-start: 1px solid var(--mat-sys-outline-variant);
+
+    a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--mat-sys-on-surface-variant);
+      text-decoration: none;
+      font: var(--mat-sys-label-medium);
+    }
+
+    .pill {
+      display: grid;
+      place-items: center;
+      inline-size: 64px;
+      block-size: 32px;
+      border-radius: 999px;
+      transition: background 150ms ease;
+    }
+
+    .active {
+      color: var(--mat-sys-on-surface);
+
+      .pill {
+        background: var(--mat-sys-secondary-container);
+        color: var(--mat-sys-on-secondary-container);
+      }
+    }
+  }
+}

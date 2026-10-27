@@ -1,0 +1,215 @@
+:host {
+  display: block;
+  block-size: 100dvh;
+
+  --paper-bg: #fdfbf6;
+  --paper-fg: #2b2a28;
+}
+
+.reader {
+  block-size: 100%;
+  background: var(--mat-sys-surface-container-low);
+
+  &[data-theme='sepia'] {
+    --paper-bg: #f4ecd8;
+    --paper-fg: #4a3b2a;
+  }
+
+  &[data-theme='night'] {
+    --paper-bg: #1e1f22;
+    --paper-fg: #d9d4ca;
+  }
+}
+
+.panel {
+  inline-size: min(380px, 92vw);
+  background: var(--mat-sys-surface-container-low);
+  border-inline-start: 1px solid var(--mat-sys-outline-variant);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--mat-sys-surface);
+  border-block-end: 1px solid var(--mat-sys-outline-variant);
+}
+
+.title {
+  flex: 1;
+  min-inline-size: 0;
+  display: flex;
+  flex-direction: column;
+  margin-inline-start: 4px;
+
+  strong,
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  strong {
+    font: var(--mat-sys-title-medium);
+  }
+
+  span {
+    font: var(--mat-sys-body-small);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.zoom {
+  display: flex;
+}
+
+.stage {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+}
+
+// EPUB: área de leitura com cara de folha de papel (a margem interna fica em .epub-stage).
+.viewport.epub-reader {
+  inset: 16px max(72px, calc((100% - 1100px) / 2));
+  border-radius: 18px;
+  background: var(--paper-bg);
+  color: var(--paper-fg);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+  transition: background 200ms ease;
+}
+
+.turn {
+  position: absolute;
+  inset-block-start: 50%;
+  translate: 0 -50%;
+  z-index: 2;
+  color: var(--mat-sys-on-surface-variant);
+  opacity: 0.6;
+  transition: opacity 150ms ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.prev {
+    inset-inline-start: max(16px, calc((100% - 1100px) / 2 - 60px));
+  }
+
+  &.next {
+    inset-inline-end: max(16px, calc((100% - 1100px) / 2 - 60px));
+  }
+}
+
+.ribbon {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 40px;
+  z-index: 3;
+  inline-size: 26px;
+  block-size: 46px;
+  background: var(--ribbon);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.25));
+  animation: drop 220ms ease-out;
+  pointer-events: none;
+}
+
+@keyframes drop {
+  from {
+    translate: 0 -100%;
+  }
+}
+
+.state {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+  padding: 24px;
+  background: var(--mat-sys-surface-container-low);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px calc(4px + env(safe-area-inset-bottom));
+  background: var(--mat-sys-surface);
+  border-block-start: 1px solid var(--mat-sys-outline-variant);
+}
+
+.seek {
+  flex: 1;
+  min-inline-size: 80px;
+}
+
+.label {
+  flex: 0 1 auto;
+  max-inline-size: 38%;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 16px 12px;
+}
+
+.settings-label {
+  margin-block-start: 6px;
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.serif {
+  font-family: Georgia, serif;
+}
+
+.font-size {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 600px) {
+  .zoom {
+    display: none;
+  }
+
+  .viewport.epub-reader {
+    inset: 8px;
+  }
+
+  .turn {
+    display: none;
+  }
+
+  .label {
+    display: none;
+  }
+}

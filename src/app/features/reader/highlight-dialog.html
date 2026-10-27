@@ -1,0 +1,99 @@
+@if (highlight(); as item) {
+  <div class="head">
+    <mat-icon class="filled" [style.color]="hex()">format_quote</mat-icon>
+    <span class="label">{{ item.label }}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button matTooltip="Excluir destaque" aria-label="Excluir destaque" (click)="remove(item)">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button mat-icon-button mat-dialog-close aria-label="Fechar"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <mat-dialog-content>
+    <blockquote [style.--mark]="hex()">{{ item.text }}</blockquote>
+
+    <section class="row">
+      <app-color-swatches
+        size="sm"
+        label="Cor do destaque"
+        [options]="colors"
+        [selected]="item.color"
+        (selectedChange)="recolor(item, $event)"
+      />
+      <span class="spacer"></span>
+      <div class="reactions">
+        @for (emoji of item.reactions; track emoji) {
+          <button type="button" class="reaction" [attr.aria-label]="'Remover reação ' + emoji" (click)="react(item, emoji)">
+            {{ emoji }}
+          </button>
+        }
+        <button mat-icon-button [matMenuTriggerFor]="reactionMenu" matTooltip="Reagir" aria-label="Adicionar reação">
+          <mat-icon>add_reaction</mat-icon>
+        </button>
+      </div>
+      <mat-menu #reactionMenu>
+        <app-emoji-picker (picked)="react(item, $event)" />
+      </mat-menu>
+    </section>
+
+    <section class="comments" aria-label="Comentários">
+      @for (comment of item.comments; track comment.id) {
+        <article class="comment">
+          @if (comment.text) {
+            <p>{{ comment.text }}</p>
+          }
+          @if (comment.audio) {
+            <div class="audio">
+              <app-audio-clip [blob]="comment.audio" />
+              <span class="muted">{{ comment.audioDuration | duration }}</span>
+            </div>
+          }
+          <footer>
+            <span class="muted">{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+            <button mat-icon-button aria-label="Excluir comentário" (click)="removeComment(item, comment.id)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </footer>
+        </article>
+      } @empty {
+        <p class="muted empty">Nenhum comentário ainda. Escreva algo, use emojis ou grave um áudio 🎙️</p>
+      }
+    </section>
+  </mat-dialog-content>
+
+  <div class="composer">
+    @if (audio(); as recorded) {
+      <div class="pending">
+        <app-audio-clip [blob]="recorded.blob" />
+        <button mat-icon-button aria-label="Descartar áudio" (click)="audio.set(null)"><mat-icon>delete</mat-icon></button>
+      </div>
+    }
+    <mat-form-field>
+      <textarea
+        #textarea
+        matInput
+        cdkTextareaAutosize
+        cdkAutosizeMaxRows="6"
+        placeholder="Escreva um comentário…"
+        aria-label="Comentário"
+        [value]="draft()"
+        (input)="draft.set(textarea.value)"
+        (keydown.control.enter)="send(item)"
+      ></textarea>
+    </mat-form-field>
+    <div class="actions">
+      <button mat-icon-button [matMenuTriggerFor]="emojiMenu" matTooltip="Emojis" aria-label="Inserir emoji">
+        <mat-icon>mood</mat-icon>
+      </button>
+      <mat-menu #emojiMenu>
+        <app-emoji-picker (picked)="insertEmoji($event)" />
+      </mat-menu>
+      <app-audio-recorder (recorded)="audio.set($event)" />
+      <span class="spacer"></span>
+      <button mat-flat-button [disabled]="!canSend()" (click)="send(item)">
+        <mat-icon>send</mat-icon>
+        Comentar
+      </button>
+    </div>
+  </div>
+}

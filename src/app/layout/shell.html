@@ -1,0 +1,52 @@
+<mat-toolbar class="topbar">
+  <a class="brand" routerLink="/biblioteca" aria-label="Leitura — início">
+    <span class="logo"><mat-icon>auto_stories</mat-icon></span>
+    <span class="brand-title">Leitura</span>
+  </a>
+
+  <nav class="desktop-nav" aria-label="Principal">
+    @for (link of links; track link.path) {
+      <a mat-button [routerLink]="link.path" routerLinkActive="active">
+        <mat-icon>{{ link.icon }}</mat-icon>{{ link.label }}
+      </a>
+    }
+  </nav>
+
+  <span class="spacer"></span>
+
+  <button mat-icon-button (click)="cycleScheme()" matTooltip="Alternar tema" aria-label="Alternar tema">
+    <mat-icon>{{ schemeIcon() }}</mat-icon>
+  </button>
+
+  <button class="avatar-button" [matMenuTriggerFor]="account" aria-label="Conta">
+    <app-user-avatar
+      [name]="profiles.displayName()"
+      [src]="profiles.avatar()"
+      [ring]="profiles.profile()?.avatarRing"
+      [size]="40"
+    />
+  </button>
+
+  <mat-menu #account xPosition="before">
+    <div class="account-head">
+      <strong>{{ profiles.displayName() }}</strong>
+      <span class="muted">{{ user()?.email }}</span>
+    </div>
+    <mat-divider />
+    <a mat-menu-item routerLink="/perfil"><mat-icon>palette</mat-icon>Personalizar perfil</a>
+    <button mat-menu-item (click)="signOut()"><mat-icon>logout</mat-icon>Sair</button>
+  </mat-menu>
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<nav class="bottom-nav" aria-label="Principal">
+  @for (link of links; track link.path) {
+    <a [routerLink]="link.path" routerLinkActive="active" #rla="routerLinkActive">
+      <span class="pill"><mat-icon [class.filled]="rla.isActive">{{ link.icon }}</mat-icon></span>
+      {{ link.label }}
+    </a>
+  }
+</nav>

@@ -1,0 +1,97 @@
+<header>
+  <h2>Anotações</h2>
+  <button mat-icon-button (click)="closed.emit()" aria-label="Fechar painel"><mat-icon>close</mat-icon></button>
+</header>
+
+<mat-tab-group mat-stretch-tabs animationDuration="150ms">
+  <mat-tab [label]="'Destaques (' + highlights().length + ')'">
+    <div class="filters">
+      <app-color-swatches
+        size="sm"
+        label="Filtrar por cor"
+        [options]="highlightColors"
+        [selected]="colorFilter()"
+        (selectedChange)="toggleFilter($event)"
+      />
+    </div>
+    <ul class="list">
+      @for (highlight of visibleHighlights(); track highlight.id) {
+        <li class="highlight" [style.--mark]="highlightHex(highlight.color)">
+          <button class="body" type="button" (click)="navigate.emit(highlight.locator)">
+            <span class="quote">{{ highlight.text }}</span>
+            <span class="meta">
+              <span>{{ highlight.label }}</span>
+              @if (highlight.comments.length) {
+                <span class="tag"><mat-icon>chat_bubble</mat-icon>{{ highlight.comments.length }}</span>
+              }
+              @if (hasAudio(highlight)) {
+                <span class="tag"><mat-icon>graphic_eq</mat-icon></span>
+              }
+              @if (highlight.reactions.length) {
+                <span class="reactions">{{ highlight.reactions.join(' ') }}</span>
+              }
+            </span>
+          </button>
+          <button mat-icon-button matTooltip="Comentários" aria-label="Abrir comentários" (click)="openHighlight.emit(highlight.id)">
+            <mat-icon>forum</mat-icon>
+          </button>
+        </li>
+      } @empty {
+        <app-empty-state
+          icon="ink_highlighter"
+          title="Nenhum destaque"
+          message="Selecione um trecho do texto e escolha uma cor para destacar."
+        />
+      }
+    </ul>
+  </mat-tab>
+
+  <mat-tab [label]="'Marcadores (' + bookmarks().length + ')'">
+    <ul class="list">
+      @for (bookmark of bookmarks(); track bookmark.id) {
+        <li class="bookmark">
+          <mat-icon class="ribbon filled" [style.color]="bookmarkHex(bookmark.color)">bookmark</mat-icon>
+          <button class="body" type="button" (click)="navigate.emit(bookmark.locator)">
+            <span class="title">{{ bookmark.title }}</span>
+            <span class="meta">{{ bookmark.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          </button>
+          <button mat-icon-button [matMenuTriggerFor]="bookmarkMenu" aria-label="Opções do marcador">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #bookmarkMenu xPosition="before">
+            <div class="menu-colors">
+              <app-color-swatches
+                size="sm"
+                label="Cor do marcador"
+                [options]="bookmarkColors"
+                [selected]="bookmark.color"
+                (selectedChange)="recolorBookmark.emit({ bookmark, color: $event })"
+              />
+            </div>
+            <button mat-menu-item (click)="removeBookmark.emit(bookmark)"><mat-icon>delete</mat-icon>Remover</button>
+          </mat-menu>
+        </li>
+      } @empty {
+        <app-empty-state
+          icon="bookmark_add"
+          title="Nenhum marcador"
+          message="Use o ícone de marcador na barra superior para marcar a página atual."
+        />
+      }
+    </ul>
+  </mat-tab>
+
+  <mat-tab label="Sumário">
+    <ul class="list toc">
+      @for (entry of toc(); track $index) {
+        <li>
+          <button type="button" class="body" [style.padding-inline-start.px]="16 + entry.depth * 16" (click)="navigate.emit(entry.locator)">
+            {{ entry.label }}
+          </button>
+        </li>
+      } @empty {
+        <app-empty-state icon="toc" title="Sem sumário" message="Este arquivo não possui um índice de capítulos." />
+      }
+    </ul>
+  </mat-tab>
+</mat-tab-group>

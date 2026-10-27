@@ -1,0 +1,159 @@
+<input #avatarInput type="file" hidden accept="image/*" (change)="onAvatarSelected(avatarInput)" />
+
+@if (profile(); as current) {
+  <section class="hero">
+    <div class="banner"></div>
+    <div class="identity">
+      <div class="avatar-wrap">
+        <app-user-avatar [name]="current.displayName" [src]="avatar()" [ring]="current.avatarRing" [size]="112" />
+        <button mat-mini-fab class="edit-avatar" (click)="avatarInput.click()" aria-label="Alterar foto">
+          <mat-icon>photo_camera</mat-icon>
+        </button>
+      </div>
+      <div class="who">
+        <h1 class="brand-title">{{ current.displayName }}</h1>
+        <p class="muted">{{ user()?.email }}</p>
+        @if (current.bio) {
+          <p class="bio">{{ current.bio }}</p>
+        }
+      </div>
+    </div>
+
+    @if (readingStats(); as stats) {
+      <dl class="stats">
+        <div><dt>Livros</dt><dd>{{ stats.books }}</dd></div>
+        <div><dt>Concluídos</dt><dd>{{ stats.finished }}</dd></div>
+        <div><dt>Destaques</dt><dd>{{ stats.highlights }}</dd></div>
+        <div><dt>Marcadores</dt><dd>{{ stats.bookmarks }}</dd></div>
+      </dl>
+    }
+  </section>
+
+  <div class="cards">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>badge</mat-icon>
+        <mat-card-title>Informações</mat-card-title>
+        <mat-card-subtitle>Como você aparece no app</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form class="form" [formGroup]="form" (ngSubmit)="saveInfo()">
+          <mat-form-field>
+            <mat-label>Nome de exibição</mat-label>
+            <input matInput formControlName="displayName" maxlength="60" />
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Bio</mat-label>
+            <textarea matInput formControlName="bio" rows="3" maxlength="160" placeholder="Fale um pouco sobre suas leituras"></textarea>
+            <mat-hint align="end">{{ form.controls.bio.value.length }}/160</mat-hint>
+          </mat-form-field>
+          <div class="actions">
+            @if (current.avatar) {
+              <button mat-button type="button" (click)="resetAvatar()">
+                <mat-icon>restart_alt</mat-icon>
+                {{ user()?.picture ? 'Usar foto do Google' : 'Remover foto' }}
+              </button>
+            }
+            <span class="spacer"></span>
+            <button mat-flat-button type="submit" [disabled]="form.invalid || form.pristine">Salvar</button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>palette</mat-icon>
+        <mat-card-title>Aparência</mat-card-title>
+        <mat-card-subtitle>Cores aplicadas em todo o app</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="stack">
+        <div class="field">
+          <span class="field-label">Paleta · {{ paletteLabel() }}</span>
+          <app-color-swatches label="Paleta de cores" [options]="palettes" [selected]="current.palette" (selectedChange)="setPalette($event)" />
+        </div>
+        <div class="field">
+          <span class="field-label">Modo</span>
+          <mat-button-toggle-group [value]="current.scheme" (change)="setScheme($event.value)" aria-label="Modo de cor">
+            <mat-button-toggle value="light"><mat-icon>light_mode</mat-icon> Claro</mat-button-toggle>
+            <mat-button-toggle value="dark"><mat-icon>dark_mode</mat-icon> Escuro</mat-button-toggle>
+            <mat-button-toggle value="system"><mat-icon>brightness_auto</mat-icon> Sistema</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <div class="field">
+          <span class="field-label">Moldura do avatar</span>
+          <app-color-swatches label="Moldura do avatar" [options]="rings" [selected]="current.avatarRing" (selectedChange)="setRing($event)" />
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="wide">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>chrome_reader_mode</mat-icon>
+        <mat-card-title>Leitura</mat-card-title>
+        <mat-card-subtitle>Preferências padrão do leitor</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content class="reading">
+        <div class="stack">
+          <div class="field">
+            <span class="field-label">Tema da página</span>
+            <div class="paper-options" role="radiogroup" aria-label="Tema da página">
+              @for (theme of readerThemes; track theme.id) {
+                <button
+                  type="button"
+                  role="radio"
+                  class="paper"
+                  [attr.data-theme]="theme.id"
+                  [attr.aria-checked]="current.reader.theme === theme.id"
+                  (click)="setReaderTheme(theme.id)"
+                >
+                  <span>Aa</span>{{ theme.label }}
+                </button>
+              }
+            </div>
+          </div>
+          <div class="field">
+            <span class="field-label">Fonte (EPUB)</span>
+            <app-font-picker [selected]="current.reader.font" (selectedChange)="setReaderFont($event)" />
+          </div>
+          <div class="field">
+            <span class="field-label">Espaçamento entre linhas</span>
+            <mat-button-toggle-group [value]="current.reader.lineHeight" (change)="setLineHeight($event.value)" aria-label="Espaçamento">
+              @for (option of lineHeights; track option.value) {
+                <mat-button-toggle [value]="option.value">{{ option.label }}</mat-button-toggle>
+              }
+            </mat-button-toggle-group>
+          </div>
+          <div class="field">
+            <span class="field-label">Animação ao virar a página</span>
+            <mat-button-toggle-group [value]="current.reader.pageAnimation" (change)="setPageAnimation($event.value)" aria-label="Animação">
+              <mat-button-toggle value="slide"><mat-icon>swipe_left</mat-icon> Deslizar</mat-button-toggle>
+              <mat-button-toggle value="fade"><mat-icon>blur_on</mat-icon> Esmaecer</mat-button-toggle>
+              <mat-button-toggle value="none"><mat-icon>block</mat-icon> Nenhuma</mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+          <div class="field">
+            <span class="field-label">Tamanho do texto · {{ current.reader.fontSize }}%</span>
+            <mat-slider min="70" max="180" step="10" discrete aria-label="Tamanho do texto">
+              <input matSliderThumb [value]="current.reader.fontSize" (valueChange)="setFontSize($event)" />
+            </mat-slider>
+          </div>
+        </div>
+
+        <div
+          class="preview"
+          [attr.data-theme]="current.reader.theme"
+          [style.font-family]="previewFont()"
+          [style.line-height]="current.reader.lineHeight"
+          [style.font-size.px]="16 * current.reader.fontSize / 100"
+        >
+          <span class="chapter">Capítulo 1</span>
+          <p>
+            Era uma vez um leitor que <mark>marcava as frases favoritas</mark> com cores diferentes e deixava
+            pequenos recados em áudio para si mesmo. 📚✨
+          </p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+}
