@@ -11,7 +11,7 @@ import {
   TocEntry,
 } from '../../domain';
 import { loadPdfJs, openPdf } from '../documents/pdfjs';
-import { debounce, Disposables, normalizeText } from './dom-listeners';
+import { debounce, Disposables, flash, normalizeText } from './dom-listeners';
 
 interface PageView {
   number: number;
@@ -116,6 +116,10 @@ export class PdfReaderEngine implements ReaderEngine {
   setHighlights(highlights: readonly Highlight[]): void {
     this.highlights = highlights;
     this.pages.forEach((page) => this.paintHighlights(page));
+  }
+
+  flashHighlight(id: string): void {
+    flash(this.host.querySelectorAll(`.pdf-highlight[data-id="${CSS.escape(id)}"]`));
   }
 
   setAppearance(_appearance: ReaderAppearance): void {
@@ -367,6 +371,7 @@ export class PdfReaderEngine implements ReaderEngine {
       return (locator.rects ?? []).map((rect) => {
         const mark = document.createElement('div');
         mark.className = 'pdf-highlight';
+        mark.dataset['id'] = highlight.id;
         mark.style.cssText = `left:${rect.x * 100}%;top:${rect.y * 100}%;width:${rect.w * 100}%;height:${rect.h * 100}%;background:${colorHex(HIGHLIGHT_COLORS, highlight.color)}`;
         return mark;
       });
