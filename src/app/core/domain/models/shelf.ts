@@ -6,12 +6,13 @@ export interface Shelf {
   ownerId: string;
   name: string;
   description: string;
-  emoji: string;
+  /** Nome de um ícone do Material Symbols. */
+  icon: string;
   color: string;
   createdAt: number;
 }
 
-export type ShelfDraft = Pick<Shelf, 'name' | 'description' | 'emoji' | 'color'>;
+export type ShelfDraft = Pick<Shelf, 'name' | 'description' | 'icon' | 'color'>;
 
 export const SHELF_COLORS: readonly ColorOption[] = [
   { id: '#4c7a5a', label: 'Sálvia', hex: '#4c7a5a' },
@@ -24,7 +25,16 @@ export const SHELF_COLORS: readonly ColorOption[] = [
   { id: '#6b6259', label: 'Café', hex: '#6b6259' },
 ];
 
-export const SHELF_EMOJIS: readonly string[] = [
-  '📚', '📖', '💼', '🎓', '❤️', '🧠', '🔬', '🎨',
-  '🌍', '🧘', '🍳', '💰', '🚀', '🔎', '🐉', '⭐',
+export const SHELF_ICONS: readonly string[] = [
+  'auto_stories', 'menu_book', 'work', 'school', 'favorite', 'psychology', 'science', 'palette',
+  'public', 'self_improvement', 'restaurant', 'savings', 'rocket_launch', 'search', 'castle', 'star',
+  'history_edu', 'gavel', 'code', 'music_note', 'sports_soccer', 'theater_comedy', 'child_care', 'travel_explore',
 ];
+
+/** Ícones equivalentes aos emojis usados antes nas bibliotecas (para migrar dados salvos). */
+export const LEGACY_SHELF_EMOJI_ICONS: Readonly<Record<string, string>> = {
+  '📚': 'auto_stories', '📖': 'menu_book', '💼': 'work', '🎓': 'school',
+  '❤️': 'favorite', '🧠': 'psychology', '🔬': 'science', '🎨': 'palette',
+  '🌍': 'public', '🧘': 'self_improvement', '🍳': 'restaurant', '💰': 'savings',
+  '🚀': 'rocket_launch', '🔎': 'search', '🐉': 'castle', '⭐': 'star',
+};
