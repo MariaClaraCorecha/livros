@@ -72,16 +72,30 @@ blockquote {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  inline-size: min(100%, 400px);
+  gap: 20px;
+  inline-size: min(100%, 420px);
   text-align: center;
-
-  h1 {
-    font-size: 40px;
-  }
 
   p {
     margin: 0;
+  }
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  h1 {
+    margin-block-start: 8px;
+    font-size: 44px;
+  }
+
+  p {
+    max-inline-size: 30ch;
+    font: var(--mat-sys-body-large);
+    text-wrap: balance;
   }
 }
 
@@ -104,19 +118,20 @@ blockquote {
 .features {
   list-style: none;
   padding: 0;
-  margin: 16px 0;
+  margin: 8px 0;
   display: grid;
-  gap: 10px;
+  gap: 12px;
   inline-size: 100%;
   text-align: start;
 
   li {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 14px;
+    gap: 14px;
+    padding: 14px 18px;
+    border-radius: 16px;
     background: var(--mat-sys-surface-container-low);
+    font: var(--mat-sys-body-large);
   }
 
   mat-icon {
@@ -148,10 +163,11 @@ blockquote {
   }
 
   ol {
-    margin: 10px 0 0;
+    margin: 12px 0 0;
     padding-inline-start: 20px;
     display: grid;
-    gap: 6px;
+    gap: 10px;
+    line-height: 1.5;
   }
 
   code {
