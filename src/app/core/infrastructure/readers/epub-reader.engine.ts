@@ -113,7 +113,7 @@ export class EpubReaderEngine implements ReaderEngine {
     });
 
     if (this.appearance) this.setAppearance(this.appearance);
-    await rendition.display(start?.kind === 'epub' ? start.cfi : undefined);
+    await this.display(start?.kind === 'epub' ? start.cfi : undefined);
     this.setHighlights(this.highlights);
     this.observeResize(stage);
 
@@ -129,7 +129,7 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   async goTo(locator: Locator): Promise<void> {
-    if (locator.kind === 'epub') await this.rendition?.display(locator.cfi);
+    if (locator.kind === 'epub') await this.display(locator.cfi);
   }
 
   async goToProgress(progress: number): Promise<void> {
@@ -141,18 +141,14 @@ export class EpubReaderEngine implements ReaderEngine {
       ? book.locations.cfiFromPercentage(clamped)
       : book.spine.get(Math.min(Math.floor(clamped * this.chapterCount()), this.chapterCount() - 1))
           ?.href;
-    await this.rendition?.display(target);
+    await this.display(target);
   }
 
   async goToPage(page: number): Promise<void> {
     const locations = this.book?.locations;
     if (!this.locationsReady || !locations) return;
     const index = Math.min(Math.max(page - 1, 0), locations.length() - 1);
-    // A localização é um intervalo; o epub.js posiciona pelo retângulo do intervalo inteiro,
-    // que pode abranger colunas anteriores. Reduzido ao ponto inicial, cai na tela certa.
-    const start = new this.lib.EpubCFI(locations.cfiFromLocation(index));
-    start.collapse(true);
-    await this.rendition?.display(start.toString());
+    await this.display(locations.cfiFromLocation(index));
   }
 
   next(): void {
@@ -222,16 +218,7 @@ export class EpubReaderEngine implements ReaderEngine {
   }
 
   isVisible(locator: Locator): boolean {
-    if (locator.kind !== 'epub' || !this.location) return false;
-    const cfi = new this.lib.EpubCFI();
-    try {
-      return (
-        cfi.compare(locator.cfi, this.location.start.cfi) >= 0 &&
-        cfi.compare(locator.cfi, this.location.end.cfi) <= 0
-      );
-    } catch {
-      return false;
-    }
+    return locator.kind === 'epub' && this.isOnScreen(locator.cfi);
   }
 
   clearSelection(): void {
@@ -247,6 +234,39 @@ export class EpubReaderEngine implements ReaderEngine {
     this.book?.destroy();
     this.host?.classList.remove('epub-reader');
     this.host?.replaceChildren();
+  }
+
+  /**
+   * Exibe o alvo (CFI ou href). Ao abrir outro capítulo, o epub.js escolhe a coluna antes de o
+   * texto terminar de se acomodar (fontes e tema), e a tela fica algumas páginas antes do alvo.
+   * Nesse caso, espera o layout assentar e exibe de novo.
+   */
+  private async display(target?: string): Promise<void> {
+    const rendition = this.rendition;
+    if (!rendition) return;
+    await rendition.display(target);
+    if (!target?.startsWith('epubcfi(') || this.isOnScreen(target)) return;
+    await this.layoutSettled();
+    if (!this.destroyed) await rendition.display(target);
+  }
+
+  private async layoutSettled(): Promise<void> {
+    const contents = (this.rendition?.getContents() ?? []) as unknown as Contents[];
+    await Promise.all(contents.map((item) => item.document.fonts.ready));
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+
+  private isOnScreen(cfi: string): boolean {
+    const location = this.location;
+    if (!location) return false;
+    const compare = new this.lib.EpubCFI();
+    try {
+      return (
+        compare.compare(cfi, location.start.cfi) >= 0 && compare.compare(cfi, location.end.cfi) <= 0
+      );
+    } catch {
+      return false;
+    }
   }
 
   /** Vira a página com uma transição curta (deslizar ou esmaecer), conforme a preferência. */
