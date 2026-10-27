@@ -19,7 +19,7 @@
     <ul class="list">
       @for (highlight of visibleHighlights(); track highlight.id) {
         <li class="highlight" [style.--mark]="highlightHex(highlight.color)">
-          <button class="body" type="button" (click)="navigate.emit(highlight.locator)">
+          <button class="body" type="button" (click)="goToHighlight.emit(highlight)">
             <span class="quote">{{ highlight.text }}</span>
             <span class="meta">
               <span>{{ highlight.label }}</span>

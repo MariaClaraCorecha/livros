@@ -42,6 +42,7 @@ export class AnnotationsPanel {
   readonly toc = input.required<readonly TocEntry[]>();
 
   readonly navigate = output<Locator>();
+  readonly goToHighlight = output<Highlight>();
   readonly openHighlight = output<string>();
   readonly recolorBookmark = output<{ bookmark: Bookmark; color: BookmarkColor }>();
   readonly removeBookmark = output<Bookmark>();
