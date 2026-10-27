@@ -1,6 +1,6 @@
 import { DOCUMENT, inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { AuthProvider, AuthUser } from '../../domain';
+import { AuthNotConfiguredError, AuthProvider, AuthUser } from '../../domain';
 
 interface GoogleIdentity {
   initialize(config: object): void;
@@ -22,25 +22,27 @@ interface GoogleIdToken {
 }
 
 const GIS_SCRIPT = 'https://accounts.google.com/gsi/client';
+const CLIENT_ID_SUFFIX = '.apps.googleusercontent.com';
 
-/** Login com Google Identity Services (botão oficial + ID token JWT). */
+/**
+ * Login com Google Identity Services (botão oficial + ID token JWT).
+ * O Client ID vem de `public/config.json` (editável sem recompilar) ou, na falta dele, de `environment`.
+ */
 @Injectable()
 export class GoogleAuthProvider extends AuthProvider {
   private readonly document = inject(DOCUMENT);
-  private readonly clientId = environment.googleClientId;
+  private clientId?: Promise<string>;
   private script?: Promise<GoogleIdentity>;
 
-  get configured(): boolean {
-    return !!this.clientId;
-  }
-
   async renderButton(host: HTMLElement, onSignIn: (user: AuthUser) => void): Promise<void> {
-    if (!this.configured) {
-      throw new Error('Defina googleClientId em src/environments para habilitar o login com Google.');
+    const clientId = await this.resolveClientId();
+    if (!clientId) throw new AuthNotConfiguredError();
+    if (!clientId.endsWith(CLIENT_ID_SUFFIX)) {
+      throw new Error(`O Client ID configurado parece inválido: ele deve terminar com "${CLIENT_ID_SUFFIX}".`);
     }
     const identity = await this.loadIdentity();
     identity.initialize({
-      client_id: this.clientId,
+      client_id: clientId,
       callback: ({ credential }: { credential: string }) => onSignIn(this.toUser(credential)),
       ux_mode: 'popup',
     });
@@ -56,6 +58,14 @@ export class GoogleAuthProvider extends AuthProvider {
 
   signOut(): void {
     this.document.defaultView?.google?.accounts.id.disableAutoSelect();
+  }
+
+  private resolveClientId(): Promise<string> {
+    this.clientId ??= fetch(new URL('config.json', this.document.baseURI), { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : {}))
+      .then((config: { googleClientId?: string }) => config.googleClientId?.trim() || environment.googleClientId)
+      .catch(() => environment.googleClientId);
+    return this.clientId;
   }
 
   private loadIdentity(): Promise<GoogleIdentity> {

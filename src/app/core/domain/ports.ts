@@ -5,8 +5,14 @@ import { AuthUser, ReaderPreferences } from './models/user';
 
 /* Portas para serviços externos (Google, PDF.js, epub.js), implementadas na infraestrutura. */
 
+/** O provedor de login ainda não recebeu suas credenciais (ex.: Client ID do Google). */
+export class AuthNotConfiguredError extends Error {
+  constructor() {
+    super('O login com Google ainda não foi configurado.');
+  }
+}
+
 export abstract class AuthProvider {
-  abstract readonly configured: boolean;
   /** Desenha o botão oficial de login dentro de `host` e notifica cada login concluído. */
   abstract renderButton(host: HTMLElement, onSignIn: (user: AuthUser) => void): Promise<void>;
   abstract signOut(): void;

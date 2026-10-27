@@ -13,7 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../core/application/auth.service';
-import { AuthProvider, AuthUser } from '../../core/domain';
+import { AuthNotConfiguredError, AuthProvider, AuthUser } from '../../core/domain';
 
 @Component({
   selector: 'app-login-page',
@@ -30,6 +30,8 @@ export class LoginPage {
 
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly needsSetup = signal(false);
+  protected readonly origin = location.origin;
   protected readonly allowGuest = environment.allowGuest;
 
   protected readonly features = [
@@ -43,7 +45,9 @@ export class LoginPage {
     afterNextRender(() => {
       this.provider
         .renderButton(this.googleButton().nativeElement, (user) => this.enter(user))
-        .catch((error: Error) => this.error.set(error.message))
+        .catch((error: Error) =>
+          error instanceof AuthNotConfiguredError ? this.needsSetup.set(true) : this.error.set(error.message),
+        )
         .finally(() => this.loading.set(false));
     });
   }

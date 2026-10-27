@@ -130,6 +130,42 @@ blockquote {
   min-block-size: 48px;
 }
 
+.setup {
+  inline-size: 100%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  text-align: start;
+  background: var(--mat-sys-surface-container);
+  font: var(--mat-sys-body-small);
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: var(--mat-sys-title-small);
+    color: var(--mat-sys-primary);
+    cursor: pointer;
+  }
+
+  ol {
+    margin: 10px 0 0;
+    padding-inline-start: 20px;
+    display: grid;
+    gap: 6px;
+  }
+
+  code {
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--mat-sys-surface-container-highest);
+    word-break: break-all;
+  }
+
+  a {
+    color: var(--mat-sys-primary);
+  }
+}
+
 .error {
   display: flex;
   align-items: center;
